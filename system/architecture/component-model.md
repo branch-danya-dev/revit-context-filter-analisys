@@ -1,78 +1,28 @@
-# Component Model
+# Модель компонентов
 
-ContextFilter реализован как Clean Architecture solution из пяти основных проектов.
+ContextFilter реализован как решение по принципам Clean Architecture из пяти основных проектов.
 
 ## Domain
 
-`ContextFilter.Domain` хранит независимый смысл системы:
-
-- filter tree;
-- `FilterDefinition`;
-- operators;
-- `ParameterKey`;
-- `ElementSnapshot`;
-- result models;
-- preset models;
-- domain interfaces.
-
-Domain не зависит от Revit, WPF или persistence implementation.
+`ContextFilter.Domain` хранит независимый смысл системы: дерево фильтра, `FilterDefinition`, операторы, `ParameterKey`, `ElementSnapshot`, модели результата и пресетов. Domain не зависит от Revit, WPF или физического хранения.
 
 ## Application
 
-`ContextFilter.Application` владеет use cases и orchestration:
-
-- collect context;
-- build Category → Family → Type projection;
-- build parameter indexes / values;
-- compile quick filter into `FilterDefinition`;
-- evaluate filter;
-- calculate selection / visibility sets;
-- build, save, delete and list presets;
-- analyze native-filter compatibility;
-- cache / debounce coordination.
-
-Application зависит от Domain.
+`ContextFilter.Application` владеет сценариями использования и координацией: подготовкой контекста и проекций, вычислением фильтра, расчётом наборов для действий, операциями с пресетами, анализом совместимости штатного фильтра и зависимостями кэша.
 
 ## Infrastructure
 
-`ContextFilter.Infrastructure` реализует технические адаптеры persistence:
-
-- `settings.json`;
-- `presets.json`;
-- `recent.json`;
-- atomic writes;
-- schema migration;
-- logging / DI extensions.
-
-Infrastructure поддерживает Application/Domain, но не определяет filter semantics.
+`ContextFilter.Infrastructure` реализует технические адаптеры хранения: `settings.json`, `presets.json`, `recent.json`, атомарную запись, миграции схем, журналирование и регистрацию инфраструктурных зависимостей.
 
 ## UI
 
-`ContextFilter.UI` отвечает за WPF presentation и interaction:
-
-- Views / ViewModels;
-- трёхзонный рабочий интерфейс;
-- UI state;
-- user feedback;
-- команды и interaction behavior.
-
-UI не является владельцем Revit document state.
+`ContextFilter.UI` отвечает за WPF-представление, ViewModels, трёхзонный рабочий интерфейс, состояние интерфейса, команды пользователя и сообщения.
 
 ## Revit
 
-`ContextFilter.Revit` адаптирует систему к host application:
+`ContextFilter.Revit` адаптирует систему к среде Autodesk Revit: `IExternalApplication`, Ribbon и панель, `ExternalEvent`, сбор данных, преобразование в Domain-модели, действия над выделением/видимостью/штатным фильтром, события, транзакции и завершение работы.
 
-- `IExternalApplication`;
-- ribbon / pane lifecycle;
-- `ExternalEvent`;
-- collection из Revit document;
-- conversion в Domain representations;
-- selection / visibility / native filter actions;
-- Revit events;
-- transactions;
-- shutdown / resource release.
-
-## Dependency direction
+## Направление зависимостей
 
 ```text
 Revit ───────→ UI
@@ -82,4 +32,4 @@ Revit ───────→ UI
   └────→ Infrastructure ────┘
 ```
 
-Физическая зависимость слоя и semantic authority — разные вещи. Например, Revit project зависит от Domain types, но сам Revit document остаётся authority для host state.
+Физическая зависимость слоя и владение состоянием — разные вещи. Revit-проект зависит от Domain-типов, но сам Revit-документ остаётся источником истины для состояния среды.

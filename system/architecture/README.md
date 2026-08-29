@@ -1,11 +1,11 @@
-# System Architecture
+# Архитектура системы
 
 Этот раздел хранит целостное архитектурное представление ContextFilter.
 
 ## Документы
 
 - [`context.md`](context.md) — система в окружении пользователя и Revit;
-- [`boundaries.md`](boundaries.md) — внешняя граница и authority;
+- [`boundaries.md`](boundaries.md) — внешняя граница и владение состоянием;
 - [`component-model.md`](component-model.md) — крупные технические компоненты и ответственности;
 - [`system-map.puml`](system-map.puml) — визуальная карта системы.
 
