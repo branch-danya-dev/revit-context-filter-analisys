@@ -8,7 +8,7 @@
 
 | | |
 |---|---|
-| **Моя роль** | System Analyst · Solution Designer · Developer |
+| **Моя роль** | Системный аналитик · Проектировщик решения · Разработчик |
 | **Заказчик** | Заместитель директора проектного института |
 | **Предметный эксперт** | BIM-координатор |
 | **Запрос** | Расширенный аналог Bimstep / ModPlus для быстрой контекстной фильтрации элементов Revit |
@@ -19,25 +19,25 @@
 
 ## Задача
 
-Пользователю нужен быстрый способ работать не со всей BIM-моделью сразу, а с выбранным контекстом: активным видом, всем документом или текущим выделением. Внутри этого контекста система должна позволять найти элементы по категории, семейству, типу и параметрам, а затем применить результат к Revit.
+Пользователю нужен быстрый способ работать не со всей BIM-моделью сразу, а с выбранной областью: активным видом, всем документом или текущим выделением. Внутри этой области система должна позволять найти элементы по категории, семейству, типу и параметрам, а затем применить найденный набор к Revit.
 
 ```text
-Revit document
+Документ Revit
       ↓
-Collection scope
+Область сбора
       ↓
-Context elements
+Элементы рабочего контекста
       ↓
-Filter definition
+Определение фильтра
       ↓
-Matched element set
+Найденный набор элементов
       ↓
-Selection / visibility / native Revit filter
+Выделение / видимость / штатный фильтр Revit
 ```
 
 ## Архитектура решения
 
-Реализованное решение построено как Clean Architecture из пяти проектов:
+Реализованное решение построено по принципам Clean Architecture и состоит из пяти проектов:
 
 ```text
                  ContextFilter.UI
@@ -52,78 +52,78 @@ ContextFilter.Infrastructure ──→ Application + Domain
 
 ContextFilter.Revit ───────────→ все слои
         │
-        └─ Revit API / ExternalEvent / collectors / actions / lifecycle
+        └─ Revit API / ExternalEvent / сбор / действия / жизненный цикл
 ```
 
 - **Domain** — модели и семантика фильтрации;
-- **Application** — use cases, orchestration, filter evaluation и порты;
-- **Infrastructure** — persistence, settings, logging и DI infrastructure;
+- **Application** — сценарии использования, координация, вычисление фильтра и порты;
+- **Infrastructure** — хранение данных, настройки, журналирование и регистрация инфраструктурных зависимостей;
 - **UI** — WPF / DockablePane / ViewModels и пользовательское взаимодействие;
-- **Revit** — add-in entry point, ExternalEvent, Revit API, collectors, native actions и host lifecycle.
+- **Revit** — точка входа плагина, `ExternalEvent`, Revit API, сбор элементов, штатные действия и жизненный цикл в среде Revit.
 
 ## Структура репозитория
 
-Репозиторий построен по принципам [SSAD](https://github.com/branch-danya-dev/ssad-methodology): сначала бизнес и система в целом, затем реальные технические зоны ответственности.
+Репозиторий построен по принципам [SSAD](https://github.com/branch-danya-dev/ssad-methodology): сначала описываются бизнес-задача и система целиком, затем реальные технические зоны ответственности.
 
 ```text
-business/        → зачем существует продукт, требования, scope, процессы, traceability
-system/          → архитектура, flows, данные, инварианты, evolution и validation
+business/        → задача продукта, требования, границы, процессы и связь требований с реализацией
+system/          → архитектура, сквозные сценарии, данные, инварианты, развитие и проверка
 
-domain/          → каноническая модель фильтра, параметров, snapshots и presets
-application/     → use cases, evaluation, orchestration, ports и set calculations
-infrastructure/  → persistence, configuration и logging
-ui/              → WPF interaction model и UI state
-revit/           → Revit API boundary, collection, ExternalEvent, actions и lifecycle
+domain/          → каноническая модель фильтра, параметров, снимков и пресетов
+application/     → сценарии использования, вычисление, координация, порты и расчёт целевых наборов
+infrastructure/  → хранение данных, конфигурация и журналирование
+ui/              → модель взаимодействия WPF и состояние интерфейса
+revit/           → граница Revit API, сбор, ExternalEvent, действия и жизненный цикл
 ```
 
 ## Главные системные различия
 
 ```text
-Revit element
-!= in-memory ElementSnapshot
+Элемент Revit
+!= ElementSnapshot в памяти
 
-parameter display name
-!= ParameterKey identity
+Отображаемое имя параметра
+!= стабильный ParameterKey
 
-parameter missing
-!= parameter empty
-!= parameter not loaded
+Параметр отсутствует
+!= параметр пуст
+!= параметр ещё не загружен
 
 FilterDefinition
-!= evaluation strategy
+!= способ его вычисления
 
-matched element set
-!= action applied to Revit
+Найденный набор элементов
+!= действие, применённое к Revit
 
-valid semantic filter
-!= necessarily convertible native Revit filter
+Корректный фильтр ContextFilter
+!= обязательно представимый штатным фильтром Revit
 ```
 
 ## Реальный цикл разработки
 
 ```text
-Customer requirements
+Требования заказчика
         ↓
-Clarification with customer + BIM coordinator
+Уточнение с заказчиком и BIM-координатором
         ↓
-System analysis
+Системный анализ
         ↓
-Solution design
+Проектирование решения
         ↓
-Implementation
+Разработка
         ↓
-User testing
+Пользовательское тестирование
         ↓
-Observed runtime / UX / host-integration issues
+Наблюдаемые проблемы выполнения, интерфейса и интеграции с Revit
         ↓
-System corrections
+Корректировка системной модели и реализации
         ↓
-Director acceptance
+Приёмка директором
         ↓
-Deployment
+Внедрение
 ```
 
-После пользовательского тестирования были, в частности, уточнены lifecycle документа, валидация настроек, работа фоновых обработчиков, горячие клавиши, загрузка пресетов, транзакционность Revit-действий и освобождение ресурсов при завершении.
+После пользовательского тестирования были, в частности, уточнены жизненный цикл документа, валидация настроек, работа фоновых обработчиков, горячие клавиши, загрузка пресетов, транзакционные требования Revit-действий и освобождение ресурсов при завершении.
 
 ## Навигация
 
