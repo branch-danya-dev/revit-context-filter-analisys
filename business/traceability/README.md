@@ -1,23 +1,32 @@
 # Traceability
 
-Кейс сохраняет связь между запросом заказчика и реализованным поведением:
+Этот раздел связывает исходную потребность с нормализованными требованиями, владельцами технического знания и фактической проверкой.
+
+## Канонический документ
+
+- [`traceability-matrix.md`](traceability-matrix.md) — requirement → source → canonical owner → validation evidence.
+
+## Цепочка
 
 ```text
-Customer requirement
+Customer need
+→ normalized requirement
 → system responsibility
-→ domain model
-→ application use case
-→ UI / Revit realization
+→ local technical owner
+→ implementation
 → user testing
 → accepted behavior
 ```
 
-## Источники evidence
+## Evidence
 
-- первоначальные ТЗ заказчика;
+Используются:
+
+- два первоначальных ТЗ;
 - уточнения в общении с заказчиком и BIM-координатором;
-- реализованный `PROJECT_ANALYSIS.md`;
-- результаты пользовательского тестирования;
-- финальная приёмка директором и последующее внедрение.
+- фактически реализованная система;
+- результаты пользовательского тестирования и stabilization fixes;
+- финальная приёмка директором;
+- факт внедрения.
 
-Публичный репозиторий является reader-oriented reconstruction и не публикует внутренние документы организации как рабочую документацию компании.
+Матрица не становится вторым источником истины для Domain / Application / Revit behavior. Она только показывает, где находится каноническое описание и почему оно существует.
