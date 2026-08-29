@@ -1,19 +1,23 @@
-# Domain Filtering
+# Domain · Filtering
 
-Фильтр представлен логическим деревом.
+`filtering/` хранит канонический **filter language ContextFilter**.
+
+Здесь определяется, что пользователь хочет найти, но не то, каким алгоритмом Application вычислит результат.
+
+## Документы
+
+- [`filter-definition.md`](filter-definition.md) — корневая модель фильтра;
+- [`logical-composition.md`](logical-composition.md) — `FilterGroup`, `FilterCondition`, AND/OR, negate, enabled state;
+- [`operator-model.md`](operator-model.md) — 19 операторов и их semantic families.
+
+## Главная граница
 
 ```text
-FilterDefinition
-├─ Scope
-├─ SelectedCategoryKeys
-└─ RootGroup
-    ├─ AND / OR
-    ├─ Negate / IsEnabled
-    └─ FilterCondition / nested FilterGroup
+Filter meaning
+!=
+Evaluation strategy
+!=
+Native Revit representation
 ```
 
-`FilterCondition` содержит `ParameterKey`, operator, operands и comparison policy.
-
-Реализация поддерживает 19 операторов: equality, string, existence/emptiness, numeric, range и list operations.
-
-Domain определяет **что означает фильтр**. Как его быстрее вычислить — ответственность Application.
+`FilterEvaluator`, inverted index, sequential/parallel scan и compatibility analyzer относятся к Application/Revit.

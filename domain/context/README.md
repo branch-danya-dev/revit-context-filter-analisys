@@ -1,16 +1,33 @@
-# Domain Context Model
+# Domain · Context
 
-Канонические scope:
+`context/` описывает **семантическую область элементов, над которой может быть построен фильтр**, и domain-представления, используемые после получения данных из Revit.
 
-- `ActiveView`;
-- `EntireDocument`;
-- `CurrentSelection`.
+## Документы
 
-`ElementSnapshot` — in-memory представление элемента для клиентской фильтрации. Оно сохраняет source identifiers, category/family/type identity и параметрические значения, но не становится authoritative Revit element.
+- [`collection-scope.md`](collection-scope.md) — три допустимых scope;
+- [`context-model.md`](context-model.md) — `CollectedContext`, identity и provenance контекста;
+- [`element-snapshot.md`](element-snapshot.md) — in-memory representation элемента;
+- [`context-tree.md`](context-tree.md) — Category → Family → Type как навигационная domain-проекция.
 
-Light snapshot может быть дополнен параметрами лениво.
+## Каноническая цепочка
 
 ```text
-not loaded
-!= parameter missing
+CollectionScope
+↓
+Candidate element identity set
+↓
+CollectedContext
+├─ ElementIds
+├─ provenance / cache identity
+└─ Category → Family → Type projection
+
+Element identity
+↓
+ElementSnapshot
+↓
+filterable domain data
 ```
+
+## Не здесь
+
+Как именно Revit собирает элементы, как выполняется incremental patch, когда запускается chunked collection и как кэш инвалидируется физически — это `application/` + `revit/`.

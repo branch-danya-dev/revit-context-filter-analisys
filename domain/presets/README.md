@@ -1,12 +1,15 @@
-# Domain Presets
+# Domain · Presets
 
-`PresetDefinition` сохраняет reusable filter intent.
+Preset — это **сохраняемый reusable filter intent**, а не сохранённый результат фильтрации и не JSON-файл.
 
-Поддерживаются два вида:
+Основная модель описана в [`preset-model.md`](preset-model.md).
 
-- **Full** — фильтр с конкретными значениями;
-- **Template** — структура условий без фиксированных значений, которые выбираются в текущем проекте.
+```text
+PresetDefinition
+→ reusable intent
 
-Preset может переживать смену рабочего Revit-контекста, потому что он хранит намерение пользователя, а не текущий matched set.
+JsonPresetStore
+→ persistence representation
+```
 
-Физическое JSON-хранение принадлежит [`../../infrastructure/persistence/`](../../infrastructure/persistence/).
+Persistence lifecycle и schema migration реализуются в `infrastructure/`, но semantic distinction `Full | Template` принадлежит Domain.
