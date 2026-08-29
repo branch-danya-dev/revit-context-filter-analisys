@@ -1,0 +1,32 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor User
+rectangle "Autodesk Revit" as Revit
+rectangle "ContextFilter" as CF {
+  rectangle "Working context" as Context
+  rectangle "Element discovery" as Discovery
+  rectangle "Parameter filtering" as Filtering
+  rectangle "Reusable presets" as Presets
+  rectangle "Actions on matched set" as Actions
+}
+
+User --> CF
+Revit --> Context : source document / view / selection
+Context --> Discovery
+Discovery --> Filtering
+Filtering --> Actions
+Filtering --> Presets
+Presets --> Filtering
+Actions --> Revit : selection / temporary visibility / native filter
+
+rectangle "Out of scope" as OOS {
+  rectangle "Geometry editing"
+  rectangle "Bulk parameter editing"
+  rectangle "Element deletion"
+  rectangle "DWG correction task"
+}
+
+CF .. OOS : not owned
+@enduml
