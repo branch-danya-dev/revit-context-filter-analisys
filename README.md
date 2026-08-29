@@ -1,167 +1,136 @@
 # ContextFilter — системный анализ
 
-> **SSAD-анализ реального реализованного плагина Autodesk Revit 2025 для контекстной фильтрации элементов BIM-модели.**
+[RU](README.md) · [EN](README_EN.md)
 
-ContextFilter сначала ограничивает рабочую область явным контекстом, затем позволяет описать фильтр над этим контекстом, вычисляет результат вне прямых вызовов Revit API и только после этого применяет найденный набор обратно к Revit через выбранное действие.
-
-<p>
-  <a href="README.md"><strong>RU</strong></a> · <a href="README_EN.md">EN</a>
-</p>
-
-Репозиторий организован по **[SSAD — System-Structured Analysis Documentation](https://github.com/branch-danya-dev/ssad-methodology)** вокруг ответственности реальной системы, а не вокруг слоёв исходного кода `Domain / Application / Infrastructure / UI`.
-
----
+> Реальный кейс системного анализа, проектирования, разработки и внедрения плагина контекстной фильтрации для Autodesk Revit 2025.
 
 ## Контекст проекта
 
-Это **реальный завершённый проект автоматизации**, а не учебный кейс. Исходная задача — разработать расширенный аналог существующих инструментов контекстной фильтрации Revit с более широкими сценариями поиска, отбора и управления видимостью элементов.
-
-| Вопрос | Контекст проекта |
+| | |
 |---|---|
-| **Моя роль** | **System Analyst · Solution Designer · Developer.** Я прошёл весь цикл: сбор и уточнение требований, системный анализ, проектирование решения, разработка, сопровождение пользовательского тестирования, стабилизация и внедрение. |
-| **Заказчик** | Задача формировалась со стороны **заместителя директора проектного института**. Название организации в публичном кейсе намеренно не раскрывается. |
-| **Предметная экспертиза** | **BIM-координатор** выступал основным domain expert и помогал уточнять реальные Revit-сценарии и ожидаемое поведение фильтра. |
-| **Эволюция требований** | Два первоначальных ТЗ относятся к одному общему направлению продукта. Отдельные детали уточнялись в общении с заказчиком, а реализация и пользовательское тестирование выявили дополнительные требования к runtime, host interaction и обработке ошибок. |
-| **Приёмка** | Финальный результат принимал **директор института**. |
-| **Результат** | Плагин **принят, внедрён и используется**. После внедрения сообщений об ошибках или претензий не поступало. Конкретный состав и количество пользователей не заявляются, потому что это отдельно не отслеживалось. |
-| **Что представляет репозиторий** | **Обезличенная публичная реконструкция системного знания**, накопленного в реальном проекте. Исходные документы заказчика, название организации и внутренние delivery-материалы не публикуются. |
+| **Моя роль** | System Analyst · Solution Designer · Developer |
+| **Заказчик** | Заместитель директора проектного института |
+| **Предметный эксперт** | BIM-координатор |
+| **Запрос** | Расширенный аналог Bimstep / ModPlus для быстрой контекстной фильтрации элементов Revit |
+| **Приёмка** | Финальный результат принимал директор института |
+| **Результат** | Плагин внедрён и используется; после внедрения ошибок и претензий не поступало |
 
-Цикл проекта:
+Название организации намеренно не публикуется.
 
-```text
-Запрос заказчика + BIM-экспертиза
-              ↓
-      Уточнение требований
-              ↓
-       Системный анализ
-              ↓
-    Проектирование решения
-              ↓
-         Реализация
-              ↓
- Пользовательское тестирование
-              ↓
-Уточнение runtime / host behavior
-              ↓
-      Приёмка директором
-              ↓
-          Внедрение
-```
+## Задача
 
-Изначальная проблема была прикладной: для поиска похожих элементов пользователю приходилось находить подходящий экземпляр на виде, выбирать его и пользоваться штатными командами Revit. Требовался быстрый способ выбирать, скрывать и изолировать элементы по категориям, семействам, типам и параметрам.
-
-В ходе уточнения появились работа с предварительной выборкой, динамическое выделение, пресеты и шаблоны, логика И/ИЛИ и инверсионные действия. Реализованная система дополнительно содержит явные scope, историю фильтров, создание штатного фильтра Revit и runtime-механику для больших выборок.
-
-История требований и изменений после пользовательского тестирования: [`evidence/requirements-evolution.md`](evidence/requirements-evolution.md).
-
----
-
-## Система одним потоком
+Пользователю нужен быстрый способ работать не со всей BIM-моделью сразу, а с выбранным контекстом: активным видом, всем документом или текущим выделением. Внутри этого контекста система должна позволять найти элементы по категории, семейству, типу и параметрам, а затем применить результат к Revit.
 
 ```text
-REVIT DOCUMENT / VIEW / SELECTION
-              ↓
-           CONTEXT
-              ↓
-           CATALOG
-              ↓
-        FILTER INTENT
-              ↓
-        RESULT ELEMENTS
-              ↓
-            ACTION
-              ↓
-            REVIT
+Revit document
+      ↓
+Collection scope
+      ↓
+Context elements
+      ↓
+Filter definition
+      ↓
+Matched element set
+      ↓
+Selection / visibility / native Revit filter
 ```
 
-`Presets / History` возвращают сохранённый intent в фильтр, а `Runtime` отвечает за freshness, cache и responsiveness.
+## Архитектура решения
 
----
-
-## Основные инварианты
-
-1. **Источник истины по модели — Revit.** Snapshot и результат фильтра — производные знания.
-2. **Контекст всегда явный:** active view, entire document и current selection — разные области.
-3. **Смысл фильтра не равен механике Revit API.** Валидный фильтр не обязан быть представим штатным `ParameterFilterElement`.
-4. **Фильтрация не меняет содержимое элементов модели.** Действия работают с selection/visibility/view configuration.
-5. **Имя параметра не является его identity.** Важны источник и вид параметра: instance/type, built-in/shared/project/synthetic.
-6. **Отсутствующий параметр не равен пустому значению.**
-7. **Кэш не является authority.** Производный контекст допустим только пока он свеж.
-8. **Доступ к Revit API проходит через контролируемую host boundary.**
-
----
-
-## Структура ответственности
+Реализованное решение построено как Clean Architecture из пяти проектов:
 
 ```text
-system/          → сквозные инварианты и synthesis
-interaction/     → запуск и пользовательская filter session
-context/         → scope, candidate set и freshness
-catalog/         → Category → Family → Type + параметры и значения
-filtering/       → смысл условий и вычисление результата
-actions/         → selection / visibility / native filter
-presets/         → сохраняемый пользовательский intent и history
-runtime/         → cache, invalidation, chunking, coalescing
-revit-boundary/  → Revit authority и безопасный API access
-evidence/        → требования, evolution и implementation traceability
+                 ContextFilter.UI
+                       │
+                       ▼
+              ContextFilter.Application
+                       │
+                       ▼
+                 ContextFilter.Domain
+
+ContextFilter.Infrastructure ──→ Application + Domain
+
+ContextFilter.Revit ───────────→ все слои
+        │
+        └─ Revit API / ExternalEvent / collectors / actions / lifecycle
 ```
 
-Это **не template SSAD** и не копия solution-структуры. Такая форма следует конкретной системе ContextFilter.
+- **Domain** — модели и семантика фильтрации;
+- **Application** — use cases, orchestration, filter evaluation и порты;
+- **Infrastructure** — persistence, settings, logging и DI infrastructure;
+- **UI** — WPF / DockablePane / ViewModels и пользовательское взаимодействие;
+- **Revit** — add-in entry point, ExternalEvent, Revit API, collectors, native actions и host lifecycle.
 
----
+## Структура репозитория
 
-## Ключевые различия
+Репозиторий построен по принципам [SSAD](https://github.com/branch-danya-dev/ssad-methodology) и по той же логике, что [Aveli System Analysis](https://github.com/branch-danya-dev/aveli-system-analysis): сначала бизнес и система в целом, затем реальные технические зоны ответственности.
+
+```text
+business/        → зачем существует продукт, требования, scope, процессы, traceability
+system/          → архитектура, flows, данные, инварианты, evolution и validation
+
+domain/          → каноническая модель фильтра, параметров, snapshots и presets
+application/     → use cases, evaluation, orchestration, ports и set calculations
+infrastructure/  → persistence, configuration и logging
+ui/              → WPF interaction model и UI state
+revit/           → Revit API boundary, collection, ExternalEvent, actions и lifecycle
+```
+
+## Главные системные различия
 
 ```text
 Revit element
-!= ElementSnapshot
+!= in-memory ElementSnapshot
 
-Parameter display name
-!= parameter identity
+parameter display name
+!= ParameterKey identity
 
-missing parameter
-!= empty value
+parameter missing
+!= parameter empty
+!= parameter not loaded
 
-semantic filter
-!= native Revit filter
+FilterDefinition
+!= evaluation strategy
 
-filter result
-!= action on result
+matched element set
+!= action applied to Revit
 
-cache hit
-!= source authority
+valid semantic filter
+!= necessarily convertible native Revit filter
 ```
 
----
-
-## Технический контекст
-
-`Autodesk Revit 2025` · `C# / .NET 8` · `WPF` · `Revit API` · `ExternalEvent` · локальная JSON persistence
-
-Реализация использует in-memory snapshots, несколько стратегий вычисления фильтра, cache invalidation, порционный сбор больших контекстов, persistent presets/history и конвертацию в штатный фильтр Revit там, где семантика совместима с ограничениями Revit API.
-
----
-
-## Evidence
+## Реальный цикл разработки
 
 ```text
-Требования заказчика
+Customer requirements
         ↓
-реализованное поведение
+Clarification with customer + BIM coordinator
         ↓
-implementation evidence
+System analysis
         ↓
-SSAD synthesis
+Solution design
         ↓
-актуальная системная модель
+Implementation
+        ↓
+User testing
+        ↓
+Observed runtime / UX / host-integration issues
+        ↓
+System corrections
+        ↓
+Director acceptance
+        ↓
+Deployment
 ```
 
-Начать историю требований: [`evidence/requirements-evolution.md`](evidence/requirements-evolution.md).
+После пользовательского тестирования были, в частности, уточнены lifecycle документа, валидация настроек, работа фоновых обработчиков, горячие клавиши, загрузка пресетов, транзакционность Revit-действий и освобождение ресурсов при завершении.
 
----
+## Навигация
 
-## Методология
+Начать с:
 
-**[SSAD — System-Structured Analysis Documentation](https://github.com/branch-danya-dev/ssad-methodology)**
-
-> **Структуру знания определяет система, а не типы документов и не слои кода.**
+1. [`business/`](business/) — зачем и для кого создавался ContextFilter;
+2. [`system/`](system/) — как решение устроено целиком;
+3. [`domain/`](domain/) — что означает фильтр и его данные;
+4. [`application/`](application/) — как выполняются пользовательские сценарии;
+5. [`revit/`](revit/) — как решение безопасно работает внутри Autodesk Revit.
