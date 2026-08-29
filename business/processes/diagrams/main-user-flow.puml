@@ -1,27 +1,27 @@
 @startuml
 start
-:Work in Revit;
-if (Preselect elements?) then (yes)
-  :Create Revit selection;
-else (no)
+:Работа в Revit;
+if (Элементы предварительно выделены?) then (да)
+  :Сформировать выделение Revit;
+else (нет)
 endif
-:Open ContextFilter;
-:Choose working context;
-:Navigate Category / Family / Type;
-:Choose parameter and value;
-:Compose filter conditions;
-:Evaluate matched set;
-if (Save reusable intent?) then (yes)
-  :Save Full preset or Template;
+:Открыть ContextFilter;
+:Выбрать рабочий контекст;
+:Перейти Категория / Семейство / Тип;
+:Выбрать параметр и значение;
+:Сформировать условия фильтра;
+:Получить найденный набор;
+if (Сохранить для повторного использования?) then (да)
+  :Сохранить полный пресет или шаблон;
 endif
-:Choose action;
-if (Action type?) then (Selection)
-  :Replace / Add / Exclude;
-elseif (Visibility)
-  :Hide / Isolate / Inverse;
-else (Native filter)
-  :Create compatible Revit filter;
+:Выбрать действие;
+if (Тип действия?) then (Выделение)
+  :Заменить / добавить / исключить;
+elseif (Видимость)
+  :Скрыть / изолировать / инвертировать;
+else (Штатный фильтр)
+  :Создать совместимый фильтр Revit;
 endif
-:Continue work in Revit;
+:Продолжить работу в Revit;
 stop
 @enduml

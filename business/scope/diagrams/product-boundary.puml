@@ -2,31 +2,31 @@
 left to right direction
 skinparam packageStyle rectangle
 
-actor User
+actor "Пользователь" as User
 rectangle "Autodesk Revit" as Revit
 rectangle "ContextFilter" as CF {
-  rectangle "Working context" as Context
-  rectangle "Element discovery" as Discovery
-  rectangle "Parameter filtering" as Filtering
-  rectangle "Reusable presets" as Presets
-  rectangle "Actions on matched set" as Actions
+  rectangle "Рабочий контекст" as Context
+  rectangle "Поиск элементов" as Discovery
+  rectangle "Параметрическая фильтрация" as Filtering
+  rectangle "Повторно используемые пресеты" as Presets
+  rectangle "Действия над найденным набором" as Actions
 }
 
 User --> CF
-Revit --> Context : source document / view / selection
+Revit --> Context : исходный документ / вид / выделение
 Context --> Discovery
 Discovery --> Filtering
 Filtering --> Actions
 Filtering --> Presets
 Presets --> Filtering
-Actions --> Revit : selection / temporary visibility / native filter
+Actions --> Revit : выделение / временная видимость / штатный фильтр
 
-rectangle "Out of scope" as OOS {
-  rectangle "Geometry editing"
-  rectangle "Bulk parameter editing"
-  rectangle "Element deletion"
-  rectangle "DWG correction task"
+rectangle "Вне границы" as OOS {
+  rectangle "Изменение геометрии"
+  rectangle "Массовое редактирование параметров"
+  rectangle "Удаление элементов"
+  rectangle "Задача корректировки DWG"
 }
 
-CF .. OOS : not owned
+CF .. OOS : не принадлежит ContextFilter
 @enduml

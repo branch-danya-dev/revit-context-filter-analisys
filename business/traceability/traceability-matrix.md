@@ -1,75 +1,64 @@
-# ContextFilter — traceability matrix
+# ContextFilter — матрица связи требований и реализации
 
-> Связывает подтверждённую потребность заказчика с нормализованными требованиями, областями системы и фактической валидацией.
+> Связывает подтверждённую потребность заказчика с нормализованными требованиями, областями системы и фактической проверкой.
 
 ## Принцип
 
-Матрица не утверждает, что все строки существовали как формальные requirement IDs в исходных ТЗ.
+Матрица не утверждает, что все идентификаторы существовали в исходных ТЗ. Они созданы в публичной аналитической реконструкции для навигации и прослеживаемости.
 
-IDs ниже созданы в публичной аналитической реконструкции для навигации и traceability.
-
-| ID | Потребность / требование | Источник | Каноническая область | Проверка / evidence |
+| ID | Потребность / требование | Источник | Каноническая область | Проверка / подтверждение |
 |---|---|---|---|---|
 | FR-01 | Запуск ContextFilter из Revit | ТЗ + реализация | `business/processes`, `ui`, `revit` | рабочая команда Ribbon, финальное тестирование |
-| FR-02 | Работа в ограниченном context | ТЗ + реализация | `business/scope`, `domain/context`, `application/context` | Active View / Entire Document / Current Selection |
-| FR-03 | Category → Family → Type | оба ТЗ | `domain/context`, `application/context`, `ui` | пользовательская навигация по текущему context |
-| FR-04 | Выбор параметра | расширенное ТЗ | `domain/parameters`, `application`, `ui` | доступные параметры текущего набора |
-| FR-05 | Выбор / ввод значения | расширенное ТЗ | `domain/parameters`, `domain/filtering`, `ui` | quick-filter workflow |
-| FR-06 | AND / OR | расширенное ТЗ | `domain/filtering` | filter engine tests + пользовательское поведение |
-| FR-07 | Не выбирать посторонние типы | первоначальное ТЗ | `domain/filtering`, `application/filtering` | исправленная точность filter result |
-| FR-08 | Dynamic highlight | расширенное ТЗ | `ui`, `application/actions`, `revit/actions` | opt-in live highlight workflow |
-| FR-09 | Replace / Add / Exclude | расширенное ТЗ + реализация | `application/actions`, `revit/actions` | selection action behavior |
-| FR-10 | Hide / Isolate / Inverse | оба ТЗ | `application/actions`, `revit/actions` | temporary visibility behavior |
-| FR-11 | Native Revit filter | реализованный продукт | `application`, `revit/actions` | compatibility analysis + Revit realization |
-| FR-12 | Full presets | расширенное ТЗ | `domain/presets`, `infrastructure/persistence` | save/load workflow |
-| FR-13 | Template presets | расширенное ТЗ | `domain/presets`, `infrastructure/persistence` | structure reusable without fixed values |
-| FR-14 | Видимое сообщение об ошибке | расширенное ТЗ + testing | `ui`, `system/review` | warning behavior |
-| FR-15 | Не изменять BIM-элементы | расширенное ТЗ | `business/scope`, `revit/actions` | filtering/visibility do not edit source geometry/data |
-| NFR-05 | Нормализовать invalid settings | user testing | `infrastructure/configuration` | stabilization fix |
-| NFR-06 | Stop document-bound work | user testing | `revit/lifecycle`, `application/context` | stabilization fix |
-| NFR-07 | Reset UI on document switch | user testing | `ui/state`, `revit/lifecycle` | stabilization fix |
-| NFR-08 | Нет тяжёлого background work при закрытой панели | user testing | `application`, `revit/lifecycle` | stabilization/performance fix |
-| NFR-09 | Не auto-open панель при старте Revit | user testing | `ui`, `revit/lifecycle` | stabilization fix |
-| NFR-11 | Не конфликтовать с native Revit controls | user testing | `ui/interaction` | Ctrl+Click заменён, hotkeys opt-in |
-| NFR-12 | Revit operations в корректном API context | user testing + implementation | `revit/external-event`, `revit/transactions` | isolation transaction fix |
-| NFR-13 | Clean shutdown | user testing | `revit/lifecycle` | shutdown optimization |
-| NFR-14 | Preset load failure visible | user testing | `infrastructure/persistence`, `ui` | warning added |
+| FR-02 | Работа в ограниченном контексте | ТЗ + реализация | `business/scope`, `domain/context`, `application/context` | `ActiveView` / `EntireDocument` / `CurrentSelection` |
+| FR-03 | Категория → Семейство → Тип | оба ТЗ | `domain/context`, `application/context`, `ui` | навигация по текущему контексту |
+| FR-04 | Выбор параметра | расширенное ТЗ | `domain/parameters`, `application`, `ui` | параметры текущего набора |
+| FR-05 | Выбор / ввод значения | расширенное ТЗ | `domain/parameters`, `domain/filtering`, `ui` | сценарий быстрого фильтра |
+| FR-06 | AND / OR | расширенное ТЗ | `domain/filtering` | тесты движка + пользовательское поведение |
+| FR-07 | Не выбирать посторонние типы | первоначальное ТЗ | `domain/filtering`, `application/filtering` | точность найденного набора |
+| FR-08 | Динамическое выделение | расширенное ТЗ | `ui`, `application/actions`, `revit/actions` | функция включается пользователем |
+| FR-09 | `Replace` / `Add` / `Exclude` | расширенное ТЗ + реализация | `application/actions`, `revit/actions` | действия над выделением |
+| FR-10 | Hide / Isolate / Inverse | оба ТЗ | `application/actions`, `revit/actions` | временная видимость |
+| FR-11 | Штатный фильтр Revit | реализованный продукт | `application`, `revit/actions` | проверка совместимости + реализация в Revit |
+| FR-12 | Полные пресеты | расширенное ТЗ | `domain/presets`, `infrastructure/persistence` | сохранение / загрузка |
+| FR-13 | Шаблоны пресетов | расширенное ТЗ | `domain/presets`, `infrastructure/persistence` | повторное использование структуры без фиксированных значений |
+| FR-14 | Видимое сообщение об ошибке | расширенное ТЗ + тестирование | `ui`, `system/review` | предупреждение пользователю |
+| FR-15 | Не изменять BIM-элементы | расширенное ТЗ | `business/scope`, `revit/actions` | поиск и временная видимость не редактируют исходные данные модели |
+| NFR-05 | Нормализовать некорректные настройки | пользовательское тестирование | `infrastructure/configuration` | исправление стабилизации |
+| NFR-06 | Останавливать работу, привязанную к закрытому документу | пользовательское тестирование | `revit/lifecycle`, `application/context` | исправление стабилизации |
+| NFR-07 | Сбрасывать состояние интерфейса при смене документа | пользовательское тестирование | `ui/state`, `revit/lifecycle` | исправление стабилизации |
+| NFR-08 | Нет тяжёлой фоновой работы при закрытой панели | пользовательское тестирование | `application`, `revit/lifecycle` | исправление производительности |
+| NFR-09 | Не открывать панель автоматически при запуске Revit | пользовательское тестирование | `ui`, `revit/lifecycle` | исправление стабилизации |
+| NFR-11 | Не конфликтовать со штатным управлением Revit | пользовательское тестирование | `ui/interaction`, `revit/lifecycle` | `Ctrl+Click` заменён на этапе тестирования; конфликтующий жест в итоговом состоянии ограничен/отключён; горячие клавиши включаются пользователем |
+| NFR-12 | Выполнять Revit-операции в корректном API-контексте | тестирование + реализация | `revit/external-event`, `revit/transactions` | исправление транзакции изоляции |
+| NFR-13 | Корректное завершение работы | пользовательское тестирование | `revit/lifecycle` | оптимизация завершения |
+| NFR-14 | Видимая ошибка загрузки пресетов | пользовательское тестирование | `infrastructure/persistence`, `ui` | добавлено предупреждение |
 
-## Requirement evolution
+## Развитие требований
 
 ```text
-Initial customer request
-→ fast Category / Family / Type actions
+Первоначальный запрос заказчика
+→ быстрые действия по Категории / Семейству / Типу
 
-Extended requirement set
-→ parameter filtering
-→ selection context
+Расширенный набор требований
+→ параметрическая фильтрация
+→ контекст текущего выделения
 → AND / OR
-→ presets / templates
-→ richer actions
+→ пресеты / шаблоны
+→ расширенные действия
 
-Implementation and user testing
-→ lifecycle safety
-→ settings validation
-→ host interaction safety
-→ performance stabilization
-→ explicit failure feedback
+Реализация и пользовательское тестирование
+→ безопасность жизненного цикла
+→ валидация настроек
+→ безопасность взаимодействия с Revit
+→ стабилизация производительности
+→ явные сообщения об ошибках
 
-Final state
-→ director acceptance
-→ deployment
-→ regular use
+Финальное состояние
+→ приёмка директором
+→ внедрение
+→ использование
 ```
 
 ## Где хранится истина
 
-Эта матрица не дублирует детальную семантику компонентов.
-
-Например:
-
-- значение AND / OR канонически раскрывается в `domain/filtering/`;
-- orchestration фильтрации — в `application/filtering/`;
-- Revit transaction / ExternalEvent behavior — в `revit/`;
-- persistence presets — в `infrastructure/`.
-
-Матрица только связывает эти знания с исходной потребностью и проверкой.
+Матрица не дублирует детальную семантику компонентов. Значение AND / OR раскрывается в `domain/filtering/`, координация вычисления — в `application/filtering/`, правила Revit `ExternalEvent` и транзакций — в `revit/`, хранение пресетов — в `infrastructure/`.
