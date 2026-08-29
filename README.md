@@ -1,165 +1,116 @@
-# ContextFilter — System Analysis
+# ContextFilter — системный анализ
 
-> **SSAD-based analysis of a real Autodesk Revit 2025 add-in for context-bounded BIM element filtering and actions.**
+> **SSAD-анализ реального реализованного плагина Autodesk Revit 2025 для контекстной фильтрации элементов BIM-модели.**
 
-ContextFilter turns a large Revit model into an explicit working context, lets the user describe a filter over that context, evaluates the filter outside Revit API calls, and applies the resulting element set back to Revit through controlled actions.
+ContextFilter сначала ограничивает рабочую область явным контекстом, затем позволяет описать фильтр над этим контекстом, вычисляет результат вне прямых вызовов Revit API и только после этого применяет найденный набор обратно к Revit через выбранное действие.
 
 <p>
-  <a href="README.md"><strong>EN</strong></a> · <a href="README_RU.md">RU</a>
+  <a href="README.md"><strong>RU</strong></a> · <a href="README_EN.md">EN</a>
 </p>
 
-The repository is structured with **[SSAD — System-Structured Analysis Documentation](https://github.com/branch-danya-dev/ssad-methodology)** around system responsibilities rather than code layers such as Domain / Application / Infrastructure / UI.
+Репозиторий организован по **[SSAD — System-Structured Analysis Documentation](https://github.com/branch-danya-dev/ssad-methodology)** вокруг ответственности реальной системы, а не вокруг слоёв исходного кода `Domain / Application / Infrastructure / UI`.
 
 ---
 
-## Project context
+## Контекст проекта
 
-This is a **real completed automation project**, not a hypothetical training case. The original request was to build an extended analogue of existing Revit context-filtering tools, with broader filtering, selection and visibility workflows for a design institute.
+Это **реальный завершённый проект автоматизации**, а не учебный кейс. Исходная задача — разработать расширенный аналог существующих инструментов контекстной фильтрации Revit с более широкими сценариями поиска, отбора и управления видимостью элементов.
 
-| Question | Project context |
+| Вопрос | Контекст проекта |
 |---|---|
-| **My role** | **System Analyst · Solution Designer · Developer.** I owned the complete delivery loop: requirement collection and clarification, system analysis, solution design, implementation, user-testing support, stabilization and deployment. |
-| **Customer** | The request came from a **deputy director of a design institute**. The organization is intentionally anonymized in this public case. |
-| **Domain expertise** | A **BIM coordinator** acted as the primary domain expert and helped clarify real Revit workflows and expected filter behavior. |
-| **Requirements evolution** | Two initial requirement drafts belonged to the same overall product direction. Some details were clarified with the customer, while implementation and user testing exposed additional runtime, host-interaction and failure-handling requirements. |
-| **Acceptance** | Final acceptance was performed by the **director of the institute**. |
-| **Outcome** | The plugin was **accepted, deployed and put into use**. No errors or complaints were reported after deployment. The exact user population is not claimed because it was not tracked for this public case. |
-| **What this repository represents** | A **sanitized, reader-oriented reconstruction of the system knowledge** accumulated through the real project. Raw customer documents, organization identity and internal delivery materials are not published. |
+| **Моя роль** | **System Analyst · Solution Designer · Developer.** Я прошёл весь цикл: сбор и уточнение требований, системный анализ, проектирование решения, разработка, сопровождение пользовательского тестирования, стабилизация и внедрение. |
+| **Заказчик** | Задача формировалась со стороны **заместителя директора проектного института**. Название организации в публичном кейсе намеренно не раскрывается. |
+| **Предметная экспертиза** | **BIM-координатор** выступал основным domain expert и помогал уточнять реальные Revit-сценарии и ожидаемое поведение фильтра. |
+| **Эволюция требований** | Два первоначальных ТЗ относятся к одному общему направлению продукта. Отдельные детали уточнялись в общении с заказчиком, а реализация и пользовательское тестирование выявили дополнительные требования к runtime, host interaction и обработке ошибок. |
+| **Приёмка** | Финальный результат принимал **директор института**. |
+| **Результат** | Плагин **принят, внедрён и используется**. После внедрения сообщений об ошибках или претензий не поступало. Конкретный состав и количество пользователей не заявляются, потому что это отдельно не отслеживалось. |
+| **Что представляет репозиторий** | **Обезличенная публичная реконструкция системного знания**, накопленного в реальном проекте. Исходные документы заказчика, название организации и внутренние delivery-материалы не публикуются. |
 
-The delivery loop was:
-
-```text
-Customer request + BIM domain expertise
-                ↓
-        Requirement clarification
-                ↓
-          System analysis
-                ↓
-          Solution design
-                ↓
-          Implementation
-                ↓
-           User testing
-                ↓
-  Runtime / host behavior corrections
-                ↓
-        Director acceptance
-                ↓
-             Deployment
-```
-
-The initial need was practical: users had to manually locate representative elements in Revit and then use native commands such as “Select All Instances” to find similar objects. The requested plugin was intended to make selection, hiding and isolation by category, family, type and parameters fast and contextual.
-
-The requirements later expanded toward current-selection filtering, dynamic highlighting, reusable presets/templates, richer condition semantics and inverse actions. The implemented system additionally contains explicit scope handling, persistent history, native Revit filter creation and runtime strategies for large contexts.
-
-See [`evidence/requirements-evolution.md`](evidence/requirements-evolution.md) for the requirement and stabilization history.
-
----
-
-## System in one flow
-
-```mermaid
-flowchart LR
-    R[Revit document / active view / selection] --> C[Context]
-    C --> G[Catalog]
-    G --> F[Filter Definition]
-    F --> E[Evaluation]
-    E --> M[Matched Element Set]
-    M --> A[Action]
-    A --> B[Revit Host Boundary]
-    B --> R
-    P[Presets / History] --> F
-    X[Runtime Freshness / Cache] -. governs .-> C
-    X -. governs .-> E
-```
-
-Core model:
+Цикл проекта:
 
 ```text
-SOURCE CONTEXT
-      ↓
-DERIVED CATALOG
-      ↓
-FILTER INTENT
-      ↓
-DERIVED RESULT SET
-      ↓
-EXPLICIT ACTION
-      ↓
-REVIT
+Запрос заказчика + BIM-экспертиза
+              ↓
+      Уточнение требований
+              ↓
+       Системный анализ
+              ↓
+    Проектирование решения
+              ↓
+         Реализация
+              ↓
+ Пользовательское тестирование
+              ↓
+Уточнение runtime / host behavior
+              ↓
+      Приёмка директором
+              ↓
+          Внедрение
 ```
 
----
+Изначальная проблема была прикладной: для поиска похожих элементов пользователю приходилось находить подходящий экземпляр на виде, выбирать его и пользоваться штатными командами Revit. Требовался быстрый способ выбирать, скрывать и изолировать элементы по категориям, семействам, типам и параметрам.
 
-## Core invariants
+В ходе уточнения появились работа с предварительной выборкой, динамическое выделение, пресеты и шаблоны, логика И/ИЛИ и инверсионные действия. Реализованная система дополнительно содержит явные scope, историю фильтров, создание штатного фильтра Revit и runtime-механику для больших выборок.
 
-1. **Revit owns source model truth.** Context snapshots and filter results are derived knowledge.
-2. **Context is explicit.** Active view, entire document and current selection are different scopes and must not be silently mixed.
-3. **Filter meaning is independent from Revit API mechanics.** A valid semantic filter may be impossible to convert into a native `ParameterFilterElement`.
-4. **Filtering does not modify model element content.** Selection and temporary visibility change interaction state; native filter creation changes annotation/view configuration, not the filtered elements themselves.
-5. **Parameter identity is not just display text.** Instance, type, built-in/shared/project and synthetic parameters require stable identity semantics.
-6. **Missing value != empty value.** The filter model keeps these cases distinct.
-7. **Cached context is trusted only while fresh.** View, selection and document changes can invalidate derived knowledge.
-8. **Revit API access crosses one controlled host boundary.** UI-side asynchronous work cannot directly treat the Revit API as thread-safe.
+История требований и изменений после пользовательского тестирования: [`evidence/requirements-evolution.md`](evidence/requirements-evolution.md).
 
 ---
 
-## Responsibility structure
+## Система одним потоком
 
 ```text
-system/
-├─ cross-system invariants, end-to-end behavior and synthesis
-│
-interaction/
-├─ launch modes, filter session workflow and action availability
-│
-context/
-├─ collection scope, candidate set and freshness
-│
-catalog/
-├─ Category → Family → Type projection, parameter identity and values
-│
-filtering/
-├─ filter definition, operators, logical composition and evaluation
-│
-actions/
-├─ selection, temporary visibility and native Revit filter semantics
-│
-presets/
-├─ reusable filter intent, templates, history and persistence ownership
-│
-runtime/
-├─ cache invalidation, chunking, request coalescing and responsiveness
-│
-revit-boundary/
-├─ Revit authority, ExternalEvent access and native realization
-│
-evidence/
-└─ requirements evolution and implementation traceability
+REVIT DOCUMENT / VIEW / SELECTION
+              ↓
+           CONTEXT
+              ↓
+           CATALOG
+              ↓
+        FILTER INTENT
+              ↓
+        RESULT ELEMENTS
+              ↓
+            ACTION
+              ↓
+            REVIT
 ```
 
-The structure follows the responsibilities of ContextFilter itself. It intentionally does **not** mirror the implementation solution folders.
+`Presets / History` возвращают сохранённый intent в фильтр, а `Runtime` отвечает за freshness, cache и responsiveness.
 
 ---
 
-## What each area answers
+## Основные инварианты
 
-| Area | Canonical question |
-|---|---|
-| [`system/`](system/) | Do the local models form one coherent filtering system? |
-| [`interaction/`](interaction/) | How does the user establish intent and trigger system behavior? |
-| [`context/`](context/) | Which Revit elements belong to this filtering session, and is that context still fresh? |
-| [`catalog/`](catalog/) | How are elements exposed as categories, families, types, parameters and values? |
-| [`filtering/`](filtering/) | What exactly does the filter mean, and which elements satisfy it? |
-| [`actions/`](actions/) | What may happen to the matched set? |
-| [`presets/`](presets/) | Which reusable user intent persists across sessions? |
-| [`runtime/`](runtime/) | How does the system remain responsive without trusting stale derived data? |
-| [`revit-boundary/`](revit-boundary/) | What is Revit authoritative for, and how may the plugin safely cross that boundary? |
-| [`evidence/`](evidence/) | Which claims came from requirements, implementation or later synthesis? |
+1. **Источник истины по модели — Revit.** Snapshot и результат фильтра — производные знания.
+2. **Контекст всегда явный:** active view, entire document и current selection — разные области.
+3. **Смысл фильтра не равен механике Revit API.** Валидный фильтр не обязан быть представим штатным `ParameterFilterElement`.
+4. **Фильтрация не меняет содержимое элементов модели.** Действия работают с selection/visibility/view configuration.
+5. **Имя параметра не является его identity.** Важны источник и вид параметра: instance/type, built-in/shared/project/synthetic.
+6. **Отсутствующий параметр не равен пустому значению.**
+7. **Кэш не является authority.** Производный контекст допустим только пока он свеж.
+8. **Доступ к Revit API проходит через контролируемую host boundary.**
 
 ---
 
-## Key analytical distinctions
+## Структура ответственности
+
+```text
+system/          → сквозные инварианты и synthesis
+interaction/     → запуск и пользовательская filter session
+context/         → scope, candidate set и freshness
+catalog/         → Category → Family → Type + параметры и значения
+filtering/       → смысл условий и вычисление результата
+actions/         → selection / visibility / native filter
+presets/         → сохраняемый пользовательский intent и history
+runtime/         → cache, invalidation, chunking, coalescing
+revit-boundary/  → Revit authority и безопасный API access
+evidence/        → требования, evolution и implementation traceability
+```
+
+Это **не template SSAD** и не копия solution-структуры. Такая форма следует конкретной системе ContextFilter.
+
+---
+
+## Ключевые различия
 
 ```text
 Revit element
@@ -169,7 +120,7 @@ Parameter display name
 != parameter identity
 
 missing parameter
-!= empty parameter value
+!= empty value
 
 semantic filter
 != native Revit filter
@@ -179,45 +130,38 @@ filter result
 
 cache hit
 != source authority
-
-physical in-process add-in
-!= absence of ownership boundaries
 ```
 
-These distinctions are the backbone of the case.
+---
+
+## Технический контекст
+
+`Autodesk Revit 2025` · `C# / .NET 8` · `WPF` · `Revit API` · `ExternalEvent` · локальная JSON persistence
+
+Реализация использует in-memory snapshots, несколько стратегий вычисления фильтра, cache invalidation, порционный сбор больших контекстов, persistent presets/history и конвертацию в штатный фильтр Revit там, где семантика совместима с ограничениями Revit API.
 
 ---
 
-## Current implementation context
-
-`Autodesk Revit 2025` · `C# / .NET 8` · `WPF` · `Revit API` · `ExternalEvent` · local JSON persistence
-
-The implementation evidence also describes in-memory snapshots, multi-strategy filter evaluation, cache invalidation, chunked collection for larger contexts, persistent presets/history and native Revit filter conversion where the current semantic filter is compatible.
-
----
-
-## Evidence model
-
-The original requirement documents are treated as **evidence**, not as the current repository architecture.
+## Evidence
 
 ```text
-Customer requirements
+Требования заказчика
         ↓
-implemented behavior
+реализованное поведение
         ↓
 implementation evidence
         ↓
 SSAD synthesis
         ↓
-current canonical system model
+актуальная системная модель
 ```
 
-Start with [`evidence/requirements-evolution.md`](evidence/requirements-evolution.md) to see how the requested behavior evolved before and during implementation.
+Начать историю требований: [`evidence/requirements-evolution.md`](evidence/requirements-evolution.md).
 
 ---
 
-## Methodology
+## Методология
 
 **[SSAD — System-Structured Analysis Documentation](https://github.com/branch-danya-dev/ssad-methodology)**
 
-> **The system determines the knowledge structure. Document types and code layers do not.**
+> **Структуру знания определяет система, а не типы документов и не слои кода.**
