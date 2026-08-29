@@ -1,24 +1,18 @@
-# Selection and visibility calculation
+# Расчёт выделения и видимости
 
 Application содержит два подтверждённых вычислительных сервиса:
 
-- `SelectionSetCalculator` — поддерживает selection intents `Replace`, `Add`, `Exclude`;
-- `VisibilitySetCalculator` — вычисляет наборы для visibility scenarios, включая inverse isolation.
+- `SelectionSetCalculator` — `Replace`, `Add`, `Exclude`;
+- `VisibilitySetCalculator` — наборы для действий видимости, включая инверсионную изоляцию.
 
-Их задача — отделить set logic от host API execution.
+Их задача — отделить логику множеств от выполнения Revit API.
 
 ```text
-current host-derived state
-+ matched element set
-+ action intent
-        ↓
-Application calculator
-        ↓
-target element set
+текущее состояние, полученное из Revit
++ найденный набор
++ тип действия
+→ расчёт Application
+→ целевой набор элементов
 ```
 
-## Почему это важно
-
-Revit adapter не должен самостоятельно придумывать business/application semantics действия. Он получает уже определённый intent/target set и реализует его средствами host API.
-
-Точные host restrictions — например, какие элементы реально могут быть скрыты на конкретном view — принадлежат Revit layer и могут скорректировать/отклонить выполнение.
+Адаптер Revit не должен самостоятельно придумывать смысл действия. Он получает уже рассчитанное намерение/множество и реализует его средствами среды. Ограничения конкретного вида Revit могут скорректировать или отклонить выполнение.

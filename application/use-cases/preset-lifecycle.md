@@ -1,34 +1,24 @@
-# Preset lifecycle
+# Жизненный цикл пресета в Application
 
-Application управляет операциями вокруг `PresetDefinition`, не владея его Domain-смыслом и не владея физическим JSON-хранилищем.
+Application управляет операциями вокруг `PresetDefinition`, не владея его смыслом Domain и физическим JSON-хранилищем.
 
 ```text
-current filter state
+текущее состояние фильтра
 → BuildPresetUseCase
 → PresetDefinition
 → IPresetStore
-→ Infrastructure adapter
+→ адаптер Infrastructure
 ```
 
-Подтверждённые use cases:
-
-- build;
-- save;
-- list;
-- delete;
-- ensure built-in presets.
-
-В реализации присутствуют пять встроенных шаблонов для стен, дверей, окон, колонн и балок.
-
-## Границы ownership
+Подтверждены операции построения, сохранения, списка, удаления и обеспечения встроенных пресетов. В реализации есть пять встроенных шаблонов для стен, дверей, окон, колонн и балок.
 
 - `PresetDefinition`, `Full`, `Template` → Domain;
-- orchestration preset lifecycle → Application;
-- JSON, schema migration, atomic write → Infrastructure;
-- отображение списка и user commands → UI.
+- координация операций → Application;
+- JSON, миграция схемы, атомарная запись → Infrastructure;
+- список и команды пользователя → UI.
 
 ```text
-preset intent
-!= persistence format
-!= current FilterResult
+условия пресета
+!= формат хранения
+!= текущий FilterResult
 ```

@@ -1,29 +1,18 @@
-# Evaluation pipeline
+# Цепочка вычисления фильтра
 
-`FilterEvaluator` принимает Domain filter intent и in-memory element representations и возвращает `FilterResult`.
+`FilterEvaluator` принимает условия Domain и представления элементов в памяти и возвращает `FilterResult`.
 
 ```text
 FilterDefinition
 + ElementSnapshot[]
-        ↓
-normalize / prepare
-        ↓
-select evaluation strategy
-        ↓
-evaluate logical tree
-        ↓
-FilterResult
+→ подготовка
+→ выбор стратегии вычисления
+→ вычисление логического дерева
+→ FilterResult
 ```
 
-Application может компилировать logical tree в execution representation (`FilterEvaluationPlan`) с short-circuit behavior для AND/OR.
+Application может компилировать дерево в `FilterEvaluationPlan` с коротким замыканием AND/OR.
 
-## Что здесь канонично
+Канонично здесь то, что вычисление работает над снимками, оптимизация может использовать план или индекс, результат обязан соответствовать операторам Domain, а ошибка выполнения не равна корректному нулевому результату.
 
-- evaluation работает над snapshots, а не напрямую над Revit elements;
-- optimization может использовать compiled plan или index;
-- результат должен соответствовать Domain operators и logical composition;
-- execution failure нельзя интерпретировать как корректный zero-match result.
-
-## Что здесь не канонично
-
-Application не переопределяет truth semantics операторов. Если появляется новый operator или меняется его meaning, canonical change начинается в Domain, а затем переоткрывает evaluator implementation.
+Application не переопределяет таблицу истинности операторов. Изменение их смысла начинается в Domain и затем переоткрывает реализацию вычислителя.

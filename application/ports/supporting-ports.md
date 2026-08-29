@@ -1,31 +1,15 @@
-# Supporting ports
+# Вспомогательные порты
 
-Кроме Revit gateway, Application использует порты для других внешних capabilities.
-
-Подтверждены:
-
-- `IPresetStore`;
-- `IFilterHistoryStore`;
-- `IPluginPreferences`;
-- `ISettingsStore`;
-- `IUiPresentationService`;
-- `IDialogService`;
-- `IAppLogger`.
-
-## Ownership
+Подтверждены `IPresetStore`, `IFilterHistoryStore`, `IPluginPreferences`, `ISettingsStore`, `IUiPresentationService`, `IDialogService`, `IAppLogger`.
 
 ```text
-Application port
-→ required capability
+Порт Application
+→ требуемая возможность
 
-Infrastructure / UI adapter
-→ concrete realization
+Адаптер Infrastructure / UI
+→ конкретная реализация
 ```
 
-Примеры:
+`IPresetStore` не означает JSON, `IDialogService` не означает WPF-окно, `IAppLogger` не означает файловый журнал. Эти технологии принадлежат адаптерам.
 
-- `IPresetStore` не означает JSON — JSON является Infrastructure implementation;
-- `IDialogService` не означает WPF window — конкретное presentation решение находится за границей;
-- `IAppLogger` не означает file logger — файловая запись является Infrastructure detail.
-
-Так Application сохраняет независимость от persistence и presentation technology.
+Так Application сохраняет независимость от конкретного хранения и представления.
