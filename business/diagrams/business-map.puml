@@ -1,0 +1,23 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Designer / BIM user" as User
+actor "Deputy director\n(customer)" as Customer
+actor "BIM coordinator\n(domain expert)" as Expert
+rectangle "ContextFilter" as CF
+rectangle "Autodesk Revit" as Revit
+
+Customer --> CF : business need\nacceptance
+Expert --> CF : domain workflow\nvalidation
+User --> CF : filter intent\naction
+CF --> User : matched set\nfeedback
+CF --> Revit : selection / visibility\ncompatible native filter
+Revit --> CF : document / view / selection\nelements / parameters
+
+note bottom of CF
+Find the right Revit elements
+inside the current working context
+and act on the matched set.
+end note
+@enduml
