@@ -1,38 +1,12 @@
 # System Flows
 
-## Открытие и сбор контекста
+Этот раздел показывает сценарии, которые пересекают несколько responsibility owners.
 
-```text
-Ribbon command
-→ UI session starts
-→ Application requests context
-→ IRevitGateway
-→ ExternalEvent
-→ Revit collector
-→ ElementIds + tree records
-→ UI binds context
-```
+## Основные flows
 
-## Фильтрация
+- [`context-to-action.md`](context-to-action.md) — основной цикл collect → filter → action;
+- [`document-lifecycle.md`](document-lifecycle.md) — изменение / закрытие / смена документа;
+- [`preset-reuse.md`](preset-reuse.md) — сохранение и повторное применение filter intent;
+- [`system-runtime.puml`](system-runtime.puml) — sequence основного runtime flow.
 
-```text
-User selects parameter values
-→ Quick Filter use case
-→ FilterDefinition
-→ FilterEvaluator
-→ matched ElementIds
-→ UI shows count / optional highlight
-```
-
-## Действие
-
-```text
-Matched ElementIds
-→ action intent
-→ Application calculation / validation
-→ Revit gateway
-→ ExternalEvent
-→ native Revit operation
-```
-
-Смысл фильтра и действие над результатом — разные стадии.
+Локальная логика каждого шага остаётся в соответствующем `domain/`, `application/`, `infrastructure/`, `ui/` или `revit/`.
