@@ -14,16 +14,45 @@ The repository is structured with **[SSAD — System-Structured Analysis Documen
 
 ## Project context
 
-This is a **completed implemented plugin project**, reconstructed as a public system-analysis case from two kinds of evidence:
+This is a **real completed automation project**, not a hypothetical training case. The original request was to build an extended analogue of existing Revit context-filtering tools, with broader filtering, selection and visibility workflows for a design institute.
 
-- customer requirement drafts describing the original problem and later requirement refinement;
-- a source-code-derived implementation analysis describing the delivered architecture and behavior.
+| Question | Project context |
+|---|---|
+| **My role** | **System Analyst · Solution Designer · Developer.** I owned the complete delivery loop: requirement collection and clarification, system analysis, solution design, implementation, user-testing support, stabilization and deployment. |
+| **Customer** | The request came from a **deputy director of a design institute**. The organization is intentionally anonymized in this public case. |
+| **Domain expertise** | A **BIM coordinator** acted as the primary domain expert and helped clarify real Revit workflows and expected filter behavior. |
+| **Requirements evolution** | Two initial requirement drafts belonged to the same overall product direction. Some details were clarified with the customer, while implementation and user testing exposed additional runtime, host-interaction and failure-handling requirements. |
+| **Acceptance** | Final acceptance was performed by the **director of the institute**. |
+| **Outcome** | The plugin was **accepted, deployed and put into use**. No errors or complaints were reported after deployment. The exact user population is not claimed because it was not tracked for this public case. |
+| **What this repository represents** | A **sanitized, reader-oriented reconstruction of the system knowledge** accumulated through the real project. Raw customer documents, organization identity and internal delivery materials are not published. |
+
+The delivery loop was:
+
+```text
+Customer request + BIM domain expertise
+                ↓
+        Requirement clarification
+                ↓
+          System analysis
+                ↓
+          Solution design
+                ↓
+          Implementation
+                ↓
+           User testing
+                ↓
+  Runtime / host behavior corrections
+                ↓
+        Director acceptance
+                ↓
+             Deployment
+```
 
 The initial need was practical: users had to manually locate representative elements in Revit and then use native commands such as “Select All Instances” to find similar objects. The requested plugin was intended to make selection, hiding and isolation by category, family, type and parameters fast and contextual.
 
 The requirements later expanded toward current-selection filtering, dynamic highlighting, reusable presets/templates, richer condition semantics and inverse actions. The implemented system additionally contains explicit scope handling, persistent history, native Revit filter creation and runtime strategies for large contexts.
 
-> The public repository does not publish raw customer documents. It reconstructs the system knowledge they support and separates requirement evidence from implementation evidence.
+See [`evidence/requirements-evolution.md`](evidence/requirements-evolution.md) for the requirement and stabilization history.
 
 ---
 

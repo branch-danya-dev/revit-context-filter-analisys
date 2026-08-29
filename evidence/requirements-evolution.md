@@ -110,6 +110,84 @@ Implementation evidence also includes:
 
 These implementation capabilities are not retroactively presented as if every detail had existed in the first customer draft. They are current system evidence.
 
+## Stage 4 — user testing and stabilization
+
+User testing exposed several behaviors that were not adequately covered by the initial requirement drafts. They were treated as new system evidence and resulted in changes to the delivered behavior.
+
+### Persisted settings must be validated
+
+Incorrect user configuration could cause runtime failures.
+
+```text
+persisted settings
+→ deserialize
+→ validate + normalize
+→ safe runtime settings
+```
+
+The system therefore treats stored configuration as input that must be checked rather than automatically trusted.
+
+### Preset-load failure must be visible
+
+Failure to load presets previously lacked clear user feedback. The delivered behavior now reports that failure instead of silently presenting an apparently valid state.
+
+### Revit document lifecycle bounds context validity
+
+Background work previously continued after a document was closed, and UI state could survive a document switch.
+
+The corrected behavior is:
+
+```text
+document closes / changes
+→ invalidate document-bound context
+→ stop obsolete background work
+→ reset document-specific UI state
+```
+
+### Background activity is session-bound
+
+The plugin initially opened automatically with Revit and event handlers could remain active even when the filter was not being used. This produced unnecessary load.
+
+The stabilized behavior moved to explicit launch and session-scoped background processing:
+
+```text
+panel closed / no active filter session
+→ no heavy collect / index / highlight work
+```
+
+Built-in presets are also initialized on first panel use rather than during Revit startup.
+
+### Convenience must not break host interaction
+
+Hotkeys were originally active by default. They became opt-in after testing.
+
+A `Ctrl + Click` interaction conflicted with native Revit multi-selection and was replaced with `Ctrl + Shift + Click`.
+
+This yields a broader rule:
+
+> **Plugin interaction must not silently steal established host-application semantics.**
+
+### Revit actions must obey host write rules
+
+Isolation behavior initially attempted a Revit operation outside the required transaction context. The implementation was corrected so host-side actions cross the Revit boundary using valid execution/transaction mechanics.
+
+### Shutdown behavior is part of runtime correctness
+
+Delays during Revit shutdown led to changes in plugin teardown and resource-release behavior. A successful filtering session is therefore not the only runtime concern; startup, idle state, document changes and shutdown are part of the system lifecycle.
+
+## Confirmed project context
+
+The project delivery context was confirmed separately from the source artifacts:
+
+- the author performed **requirement collection, system analysis, solution design, development and deployment**;
+- the customer role was held by a **deputy director of a design institute**;
+- a **BIM coordinator** acted as the domain expert;
+- the organization name is intentionally not published;
+- final acceptance was performed by the **director of the institute**;
+- the plugin was deployed and is in use;
+- no errors or complaints were reported after deployment;
+- the exact user population is not claimed because it was not tracked for this public case.
+
 ## Requirement evidence != current authority
 
 Historical documents answer:
@@ -131,8 +209,7 @@ requested UI representation
 
 implementation class
 != responsibility owner
+
+first implementation
+!= final system knowledge
 ```
-
-## Open presentation context
-
-The supplied artifacts establish customer-originated requirements and implemented behavior, but they do not by themselves establish every public-facing project fact such as personal role, team composition, acceptance process or deployment scale. Those facts should be added only from separately confirmed project evidence.
