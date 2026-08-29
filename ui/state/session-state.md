@@ -1,52 +1,29 @@
-# Session state
+# Состояние пользовательской сессии
 
-ContextFilter distinguishes the existence of UI controls from an **active user session**.
+ContextFilter различает существование элементов UI и **активную пользовательскую сессию**.
 
-## Active session
+Сессия активна, когда пользователь действительно работает с интерфейсом фильтра и фоновые операции полезны для текущего взаимодействия.
 
-A session is active when the user is actually working with the filter UI and runtime work may be useful for the current interaction.
-
-This distinction matters because source analysis records a final contract:
+Подтверждённый контракт:
 
 ```text
 IsUserSessionActive == false
-→ no collect/index/highlight work on Idling
-→ minimal background CPU
+→ нет сбора / индексации / подсветки на Idling
+→ минимальная фоновая нагрузка
 ```
 
-The actual `Idling` gating belongs to `revit/`, but UI owns the interaction state that determines whether the user session is active.
+Фактическое ограничение `Idling` принадлежит `revit/`, а UI хранит состояние взаимодействия, по которому определяется активность сессии.
 
-## Optional live behavior
+## Дополнительное автоматическое поведение
 
-The UI exposes convenience features such as:
-
-- dynamic highlight;
-- auto-refresh;
-- hotkeys.
-
-They are not required for a valid filter session and are default-off under calm settings.
+UI предлагает динамическое выделение, автоматическое обновление и горячие клавиши. Они не требуются для корректной фильтрации и по умолчанию выключены в безопасной конфигурации.
 
 ```text
-filter correctness
-must not depend on
-live convenience enabled
+корректность фильтра
+не должна зависеть от
+включения дополнительных автоматических функций
 ```
 
-## Busy and progress state
+Длительные операции могут отображать состояние занятости и прогресс. Устаревший ответ от другого документа или завершённой сессии не должен восстанавливать старое состояние UI.
 
-Long-running collection/index work may make the UI busy and update progress. This state must correspond to the currently relevant request/session.
-
-A stale response from an obsolete document/session must not revive old UI state.
-
-## Closing the UI
-
-Closing/hiding the active panel ends the need for heavy session-bound background work.
-
-This does not mean:
-
-```text
-close UI
-→ close Revit document
-```
-
-It means only that runtime work whose sole purpose is servicing the interactive panel should stop or remain dormant until the user resumes the session.
+Закрытие/скрытие панели завершает необходимость тяжёлой работы, предназначенной только для интерактивной сессии. Это не означает закрытие Revit-документа.

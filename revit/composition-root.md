@@ -1,12 +1,8 @@
-# Composition Root
+# Корень сборки зависимостей
 
-`AddinHost` является composition root ContextFilter внутри Revit.
+`AddinHost` является точкой, где ContextFilter собирается в работающий граф внутри Revit.
 
-## Что здесь собирается
-
-Реализация регистрирует Infrastructure adapters, Application services, Revit-specific services, gateway и UI ViewModel в одном runtime container.
-
-Подтверждённый фрагмент composition root включает:
+Подтверждённый фрагмент регистрации:
 
 ```text
 AddContextFilterInfrastructure()
@@ -19,34 +15,19 @@ IRevitGateway → RevitExternalEventDispatcher
 MainPaneViewModel
 ```
 
-## Почему owner — Revit
-
-Сам DI container не является бизнес-архитектурой. Но точка, в которой конкретные Application ports связываются с Revit adapters и запускаются внутри Revit process, принадлежит host layer.
+DI-контейнер не является бизнес-архитектурой. Но место, где порты Application связываются с адаптерами Revit и запускаются внутри процесса Revit, принадлежит слою Revit.
 
 ```text
-Application
-→ declares ports and services
-
-Infrastructure
-→ provides file/settings adapters
-
-Revit AddinHost
-→ composes concrete runtime graph
+Application → объявляет порты и сервисы
+Infrastructure → предоставляет адаптеры хранения
+Revit AddinHost → собирает конкретный рабочий граф
 ```
 
-## Startup relation
-
-`ContextFilterApplication.OnStartup()` инициирует `AddinHost.Initialize()`, после чего доступны ExternalEvent infrastructure, dockable pane и ribbon command.
-
-Composition root не должен менять meaning объектов Domain. Его задача — построить работоспособный runtime graph.
-
-## Важное различие
+`ContextFilterApplication.OnStartup()` инициирует `AddinHost.Initialize()`.
 
 ```text
-service registration
-!= service ownership
+регистрация сервиса
+!= владение его ответственностью
 ```
 
-То, что `FilterEvaluator` зарегистрирован в Revit composition root, не делает его Revit responsibility. Каноническая ответственность evaluator остаётся в `application/filtering/`.
-
-Аналогично `JsonPresetStore` может быть создан через общий container, но его реализация принадлежит `infrastructure/`.
+То, что `FilterEvaluator` зарегистрирован здесь, не делает его ответственностью Revit; его канонический владелец — `application/filtering/`.

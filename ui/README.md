@@ -1,81 +1,49 @@
 # UI
 
-`ContextFilter.UI` — WPF-слой представления ContextFilter. Его ответственность — сделать Domain/Application возможности управляемыми для пользователя и хранить только тот state, который относится к текущей пользовательской сессии и представлению.
+`ContextFilter.UI` — WPF-слой представления ContextFilter. Его ответственность — сделать возможности Domain/Application управляемыми для пользователя и хранить только состояние текущей пользовательской сессии и представления.
 
-UI не определяет смысл фильтра, не реализует Application use cases и не обращается к Revit API напрямую.
-
-## Граница слоя
+UI не определяет смысл фильтра, не реализует сценарии Application и не обращается к Revit API напрямую.
 
 ```text
-User
+Пользователь
   ↓
 View / ViewModel
   ↓
-Application contracts / IRevitGateway
+контракты Application / IRevitGateway
   ↓
-async response
+асинхронный ответ
   ↓
-UI state / feedback
+состояние UI / сообщение пользователю
 ```
 
 Канонические владельцы:
 
-- `domain/` — FilterDefinition, ParameterKey, scope и action semantics;
-- `application/` — use cases, evaluation и orchestration;
-- `infrastructure/` — settings/presets/history persistence;
-- `revit/` — ExternalEvent, Revit API и host-side effects;
-- `ui/` — представление, команды пользователя, UI state и feedback.
+- `domain/` — `FilterDefinition`, `ParameterKey`, `CollectionScope` и семантика действий;
+- `application/` — сценарии, вычисление и координация;
+- `infrastructure/` — хранение настроек, пресетов и истории;
+- `revit/` — `ExternalEvent`, Revit API и реальные изменения среды;
+- `ui/` — представление, команды пользователя, состояние интерфейса и сообщения.
 
 ## Представление
 
-Реализация поддерживает две формы:
+Реализация поддерживает `DockablePane` как основной режим и `FloatingWindow` как альтернативное представление той же функциональности.
 
-- `DockablePane` — основной и default режим;
-- `FloatingWindow` — альтернативное представление той же функциональности.
-
-Основная рабочая область содержит:
-
-1. выбор scope;
-2. панель действий;
-3. Category / Family / Type;
-4. параметры;
-5. значения и активные условия;
-6. presets/history;
-7. progress, matched count и refresh.
+Основная рабочая область содержит выбор области, панель действий, три колонки Категория/Семейство/Тип → Параметры → Значения/результат, пресеты/историю, прогресс, количество совпадений и обновление.
 
 ## Структура
 
 ```text
 ui/
-├─ interaction/   → как пользователь управляет фильтром и получает feedback
-├─ state/         → ViewModel/session/document-bound UI state
-└─ diagrams/      → UI flow
+├─ interaction/   → пользовательское взаимодействие и сообщения
+├─ state/         → состояние ViewModel, сессии и документа
+└─ diagrams/      → сквозной сценарий UI
 ```
-
-## Ключевые различия
 
 ```text
-UI command
-!= Application use case
-
-UI selection state
-!= Revit selection authority
-
-visible filter condition
-!= FilterDefinition ownership
-
-matched count
-!= host action success
-
-loaded persisted settings
-!= trusted runtime settings
-
-pane lifetime
-!= Revit document lifetime
+команда UI != сценарий Application
+состояние выбора в UI != выделение Revit
+видимое условие != владение FilterDefinition
+количество совпадений != успешное действие в Revit
+загруженные настройки != проверенные настройки
+время жизни панели != время жизни Revit-документа
 ```
-
-## Навигация
-
-1. [`interaction/`](interaction/) — экран, действия, presentation modes и guardrails.
-2. [`state/`](state/) — ViewModels, lifecycle и document-bound state.
-3. [`diagrams/ui-flow.puml`](diagrams/ui-flow.puml) — сквозной UI flow.

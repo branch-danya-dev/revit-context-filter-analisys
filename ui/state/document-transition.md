@@ -1,48 +1,30 @@
-# Document transition
+# Смена документа
 
-Часть UI state зависит от текущего Revit document и должна инвалидироваться вместе с ним.
+Часть состояния UI зависит от текущего Revit-документа и должна инвалидироваться вместе с ним.
 
-## Problem
-
-Во время пользовательского тестирования UI state мог пережить переключение документа. Это создавало ложную видимость того, что старые tree/parameters/results относятся к новому document context.
-
-## Corrected behavior
+Во время пользовательского тестирования состояние интерфейса могло пережить переключение документа, создавая ложную видимость того, что старые дерево, параметры и результаты относятся к новому документу.
 
 ```text
-Document A active
-→ UI state derived from A
+Документ A активен
+→ состояние UI получено из A
 
-switch / close A
-→ invalidate A-bound UI state
-→ cancel/ignore obsolete pending responses
-→ reset document-specific presentation
+закрыть / переключить A
+→ инвалидировать состояние A
+→ отменить или проигнорировать устаревшие ответы
+→ сбросить представление документа
 
-Document B active
-→ collect/rebuild only for B
+Документ B активен
+→ собирать и строить данные только для B
 ```
 
-## Что считается document-bound
+К состоянию документа относятся как минимум дерево контекста, значения индекса параметров, найденный результат/количество, представление `CurrentSelection` и прогресс устаревшего запроса.
 
-К document-bound presentation относятся, как минимум, проекции текущих:
-
-- context tree;
-- parameter/index values;
-- matched result/count;
-- current selection-derived scope presentation;
-- progress/result, относящиеся к obsolete request.
-
-## Что не обязано исчезать
-
-Не вся UI state обязана быть document-specific. Например, user preferences или reusable preset intent могут существовать независимо от текущего документа.
+Пользовательские настройки и повторно используемые пресеты могут существовать независимо от документа.
 
 ```text
-document switch
-!= delete persisted settings
-!= delete presets
+смена документа
+!= удалить настройки
+!= удалить пресеты
 ```
 
-## Инвариант
-
-> UI не должен показывать derived state как текущий, если document identity, из которого он был получен, больше не является текущим.
-
-Механизм обнаружения `DocumentOpened/Closed/Changed` и host cancellation принадлежит `revit/`; UI владеет очисткой и новым presentation state после такого сигнала.
+> UI не должен показывать производное состояние как текущее, если документ, из которого оно получено, больше не является текущим.

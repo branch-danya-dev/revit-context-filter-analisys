@@ -1,47 +1,47 @@
-# Requirements
+# Требования
 
-Этот раздел хранит нормализованный requirement set ContextFilter.
+Этот раздел хранит нормализованный набор требований ContextFilter.
 
-Исходные требования были переданы двумя customer documents и точечно уточнялись в общении. Они рассматриваются как **одна развивающаяся задача**.
+Исходные требования были переданы двумя документами заказчика и точечно уточнялись в общении. Они рассматриваются как **одна развивающаяся задача**.
 
 ## Документы
 
 - [`functional-requirements.md`](functional-requirements.md) — функциональное поведение продукта;
 - [`non-functional-requirements.md`](non-functional-requirements.md) — ограничения качества и требования устойчивости;
 - [`business-rules.md`](business-rules.md) — правила, которые должны сохранять пользовательский смысл системы;
-- [`acceptance-criteria.md`](acceptance-criteria.md) — исходная пустая формальная секция, derived acceptance baseline и фактическая приёмка.
+- [`acceptance-criteria.md`](acceptance-criteria.md) — исходная незаполненная формальная секция, аналитически восстановленный базовый набор критериев и фактическая приёмка.
 
 ## Эволюция
 
 ```text
-Initial request
-→ Category / Family / Type
-→ Select / Hide / Isolate
+Первоначальный запрос
+→ Категория / Семейство / Тип
+→ Выбрать / скрыть / изолировать
 
-Extended request
-→ Current Selection context
-→ parameter filtering
+Расширенный запрос
+→ работа с текущим выделением
+→ параметрическая фильтрация
 → AND / OR
-→ dynamic highlight
-→ presets / templates
-→ inverse / exclude actions
+→ динамическое выделение
+→ пресеты / шаблоны
+→ инверсионные действия / исключение
 
-User testing
-→ settings validation
-→ lifecycle safety
-→ failure visibility
-→ host interaction fixes
-→ performance stabilization
+Пользовательское тестирование
+→ валидация настроек
+→ безопасность жизненного цикла
+→ видимость ошибок
+→ исправления взаимодействия с Revit
+→ стабилизация производительности
 ```
 
 ## Важное различие
 
 ```text
-customer requirement
-!= architecture decision
-!= implementation optimization
+Требование заказчика
+!= архитектурное решение
+!= оптимизация реализации
 ```
 
-Например, presets являются продуктовым требованием, а JSON persistence — уже технической реализацией. Быстрая фильтрация является ожидаемым качеством, а inverted index / parallel scan — способом реализации.
+Например, пресеты являются продуктовым требованием, а JSON-хранение — технической реализацией. Быстрая фильтрация является ожидаемым качеством, а инвертированный индекс и параллельное вычисление — способом реализации.
 
-Traceability: [`../traceability/traceability-matrix.md`](../traceability/traceability-matrix.md).
+Связь требований и реализации: [`../traceability/traceability-matrix.md`](../traceability/traceability-matrix.md).

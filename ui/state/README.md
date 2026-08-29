@@ -1,54 +1,29 @@
-# UI State
+# Состояние UI
 
-UI state — это представление текущей пользовательской сессии, а не копия Revit document и не каноническая Domain-модель.
+Состояние UI — представление текущей пользовательской сессии, а не копия Revit-документа и не каноническая модель Domain.
 
-## Что хранит UI
-
-UI может хранить:
-
-- выбранный scope option;
-- раскрытие/выбор узлов context tree;
-- текущий parameter selection;
-- выбранные values;
-- active filter conditions для отображения;
-- matched count;
-- busy/progress/error state;
-- выбранный preset/history item;
-- presentation/settings controls.
-
-## Что UI не делает authority
+UI может хранить выбранную область, раскрытые/отмеченные узлы дерева, выбранные параметры и значения, активные условия для отображения, количество совпадений, прогресс/ошибку, выбранный пресет или запись истории и настройки представления.
 
 ```text
-UI tree state
-!= candidate-set authority
-
-UI parameter label
-!= ParameterKey identity
-
-UI matched count
-!= FilterResult ownership
-
-UI selected action
-!= committed Revit effect
+состояние дерева UI != источник множества кандидатов
+подпись параметра UI != идентичность ParameterKey
+количество совпадений UI != владение FilterResult
+выбранное действие UI != выполненное действие в Revit
 ```
 
-## Lifecycle
-
-Document-bound state должен быть валиден только для document context, из которого он получен.
+Состояние, зависящее от документа, действительно только для того Revit-контекста, из которого оно получено.
 
 ```text
-Document A
-→ UI projection A
+Документ A
+→ проекция UI A
 
-switch to Document B
-→ projection A invalid
-→ reset document-bound UI state
-→ rebuild from B when requested/allowed
+переход к документу B
+→ проекция A недействительна
+→ сброс состояния, привязанного к документу
+→ при необходимости перестроить из B
 ```
 
-## Документы
-
-- [`viewmodel-responsibilities.md`](viewmodel-responsibilities.md) — распределение state по ViewModels;
-- [`session-state.md`](session-state.md) — активная пользовательская сессия и optional live behavior;
-- [`binding-lifecycle.md`](binding-lifecycle.md) — безопасный WPF binding;
-- [`document-transition.md`](document-transition.md) — reset при смене/закрытии документа.
+- [`viewmodel-responsibilities.md`](viewmodel-responsibilities.md)
+- [`session-state.md`](session-state.md)
+- [`binding-lifecycle.md`](binding-lifecycle.md)
+- [`document-transition.md`](document-transition.md)

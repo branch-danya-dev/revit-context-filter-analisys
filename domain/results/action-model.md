@@ -1,66 +1,22 @@
-# Action Model
+# Модель действий
 
-Domain содержит типы намерений, которые могут быть применены к найденному element set.
+Domain содержит типы намерений, применимых к найденному набору элементов.
 
 ## SelectionAction
-
-```text
-Replace
-Add
-Exclude
-```
-
-Semantic meaning:
-
-- `Replace` — найденный набор становится новым selection;
-- `Add` — найденный набор добавляется к существующему selection;
-- `Exclude` — найденный набор исключается из существующего selection.
-
-Конкретный расчёт set operations принадлежит Application, а вызов `UIDocument.Selection` — Revit layer.
+`Replace`, `Add`, `Exclude` означают заменить выделение, добавить к нему или исключить найденный набор. Расчёт множеств принадлежит Application, вызов `UIDocument.Selection` — Revit.
 
 ## VisibilityAction
-
-```text
-HideTemporary
-IsolateTemporary
-IsolateInverse
-ResetTemporary
-```
-
-Эти значения выражают user intent относительно временной видимости.
-
-Конкретная реализация Revit temporary hide/isolate принадлежит `revit/actions/`.
+`HideTemporary`, `IsolateTemporary`, `IsolateInverse`, `ResetTemporary` выражают намерение относительно временной видимости. Реализация принадлежит `revit/actions/`.
 
 ## NativeFilterAction
-
-Подтверждённые action values:
-
-```text
-Create
-ReplaceExisting
-```
-
-Для конфликта имени/существующего native filter используется `NativeFilterConflictResolution`:
+Подтверждены `Create`, `ReplaceExisting`; для конфликта присутствует `NativeFilterConflictResolution`: `Replace`, `Skip`, `Rename`.
 
 ```text
-Replace
-Skip
-Rename
-```
-
-## Главная граница
-
-```text
-Domain action enum
+Тип действия Domain
 !=
-Revit API call
+вызов Revit API
 ```
 
-Domain описывает **что пользователь хочет сделать**. Revit layer решает, как это допустимо выполнить внутри host transaction/API constraints.
+Domain описывает **что пользователь хочет сделать**. Слой Revit решает, как это допустимо выполнить в текущем API и транзакционном контексте.
 
-## Инварианты
-
-1. `SelectionAction` не должен изменять source model geometry/parameters.
-2. Temporary visibility action относится к view state, а не к filter semantics.
-3. Native filter creation возможна только если filter definition совместим с Revit representation.
-4. Неуспешная host action не превращает исходный filter result в неправильный.
+Неуспешное действие в Revit не делает исходный `FilterResult` неправильным.

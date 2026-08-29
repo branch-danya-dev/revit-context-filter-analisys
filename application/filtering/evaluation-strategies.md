@@ -1,31 +1,22 @@
-# Evaluation strategies
+# Стратегии вычисления
 
-Реализация содержит три режима выполнения `FilterEvaluator`.
+Реализация содержит три режима `FilterEvaluator`.
 
-## 1. Inverted index fast path
+## 1. Инвертированный индекс
+Быстрый путь для поддерживаемых простых форм, включая подтверждённые `Equals`, `InList`, `NotExists`, `IsEmpty`.
 
-Применяется к поддерживаемым простым формам фильтра; source analysis отдельно называет `Equals`, `InList`, `NotExists`, `IsEmpty`.
+## 2. Последовательный проход
+Используется для сложных деревьев или небольших наборов. Дерево компилируется в `FilterEvaluationPlan` с коротким замыканием AND/OR.
 
-`InvertedParameterIndex` позволяет переиспользовать lookup по normalized parameter value для того же snapshot set.
-
-## 2. Sequential scan
-
-Используется для сложных деревьев или небольших candidate sets. Logical tree компилируется в `FilterEvaluationPlan` и выполняется с short-circuit AND/OR.
-
-## 3. Parallel scan
-
-Для достаточно больших candidate sets реализация может выполнять evaluation параллельно. В анализируемой версии указан threshold 1500 элементов.
-
-## Системное правило
+## 3. Параллельный проход
+Для достаточно больших наборов вычисление может выполняться параллельно. В анализируемой версии порог составляет 1500 элементов.
 
 ```text
-strategy choice
-→ performance decision
+выбор стратегии
+→ решение производительности
 
-strategy choice
-≠ semantic decision
+выбор стратегии
+!= изменение семантики
 ```
 
-Fast path допустим только если он доказуемо эквивалентен общей evaluation semantics.
-
-Thresholds являются configuration/runtime detail и могут меняться без изменения Domain model.
+Быстрый путь допустим только при логической эквивалентности общему вычислению. Числовые пороги являются деталями конфигурации и могут меняться без изменения Domain.

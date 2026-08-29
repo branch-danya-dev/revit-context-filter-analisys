@@ -1,33 +1,24 @@
-# Domain · Context
+# Domain · Контекст
 
-`context/` описывает **семантическую область элементов, над которой может быть построен фильтр**, и domain-представления, используемые после получения данных из Revit.
+`context/` описывает **семантическую область элементов, над которой может быть построен фильтр**, и представления Domain после получения данных из Revit.
 
 ## Документы
 
-- [`collection-scope.md`](collection-scope.md) — три допустимых scope;
-- [`context-model.md`](context-model.md) — `CollectedContext`, identity и provenance контекста;
-- [`element-snapshot.md`](element-snapshot.md) — in-memory representation элемента;
-- [`context-tree.md`](context-tree.md) — Category → Family → Type как навигационная domain-проекция.
-
-## Каноническая цепочка
+- [`collection-scope.md`](collection-scope.md) — три допустимые области;
+- [`context-model.md`](context-model.md) — `CollectedContext`, идентичность и происхождение контекста;
+- [`element-snapshot.md`](element-snapshot.md) — представление элемента в памяти;
+- [`context-tree.md`](context-tree.md) — Категория → Семейство → Тип как навигационная проекция.
 
 ```text
 CollectionScope
 ↓
-Candidate element identity set
+множество идентификаторов кандидатов
 ↓
 CollectedContext
-├─ ElementIds
-├─ provenance / cache identity
-└─ Category → Family → Type projection
-
-Element identity
 ↓
 ElementSnapshot
 ↓
-filterable domain data
+данные, пригодные для фильтрации
 ```
 
-## Не здесь
-
-Как именно Revit собирает элементы, как выполняется incremental patch, когда запускается chunked collection и как кэш инвалидируется физически — это `application/` + `revit/`.
+Как именно Revit собирает элементы, выполняет локальное обновление и порционный сбор, а кэш физически инвалидируется — это `application/` + `revit/`.

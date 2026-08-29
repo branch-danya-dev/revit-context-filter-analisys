@@ -1,53 +1,38 @@
-# Scope collection
+# Реализация областей сбора в Revit
 
-Domain определяет три `CollectionScope`, а Revit layer реализует их через host API.
+Domain определяет `CollectionScope`, а слой Revit реализует его через API среды.
 
 ## ActiveView
 
 ```text
 CollectionScope.ActiveView
-→ current Document + active View
-→ FilteredElementCollector scoped to active view
+→ текущий Document + активный View
+→ FilteredElementCollector для активного вида
 ```
-
-Смена active view меняет host boundary такого context и требует пересмотра derived data.
 
 ## EntireDocument
 
 ```text
 CollectionScope.EntireDocument
-→ current Document
-→ project-wide element collection
+→ текущий Document
+→ сбор элементов документа
 ```
 
-Это самый широкий host read. Предупреждение для больших моделей и chunking являются runtime guardrails, а не изменением смысла scope.
+Предупреждение больших моделей и порционный сбор не меняют смысл области.
 
 ## CurrentSelection
 
 ```text
 CollectionScope.CurrentSelection
-→ UIDocument current selection
-→ selected ElementIds
+→ текущее UIDocument.Selection
+→ выбранные ElementId
 ```
 
-Selection является частью host state. Если пользователь меняет selection, ранее собранный CurrentSelection context больше не описывает текущий selection.
+Изменение выделения делает прежний контекст `CurrentSelection` неактуальным.
 
-## Supported element rules
-
-Implementation analysis подтверждает исключение:
-
-- `View`;
-- `ElementType`;
-- internal categories.
-
-Эти правила принадлежат Revit adapter, потому что выражают, какие Autodesk Revit entities могут быть представлены ContextFilter как рабочие project elements.
-
-## Ключевое различие
+`SupportedElementRules` исключает `View`, `ElementType` и внутренние категории.
 
 ```text
-scope meaning
-→ Domain
-
-how to query Revit for that scope
-→ Revit
+смысл области → Domain
+способ запросить её в Revit → Revit
 ```

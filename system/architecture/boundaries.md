@@ -1,70 +1,63 @@
-# System Boundaries
+# Границы системы
 
 ## Внутри границы ContextFilter
 
 В систему входят:
 
-- Domain-модель фильтра, параметров, presets и результатов;
-- Application use cases и evaluation services;
-- persistence настроек, presets и history;
-- WPF UI и его interaction state;
-- Revit add-in entry point;
-- ExternalEvent / request queue;
-- collectors, converters и action services;
-- lifecycle coordination;
-- derived cache, indexes и performance coordination.
+- Domain-модель фильтра, параметров, пресетов и результатов;
+- сценарии использования и вычислительные сервисы Application;
+- хранение настроек, пресетов и истории;
+- WPF-интерфейс и его состояние;
+- точка входа плагина в Revit;
+- `ExternalEvent` и очередь запросов;
+- сборщики, преобразователи и сервисы действий;
+- координация жизненного цикла;
+- производные кэши, индексы и механизмы производительности.
 
 ## За пределами границы
 
-Внешним authority остаётся Autodesk Revit:
+Autodesk Revit остаётся источником истины для:
 
 ```text
-Revit owns
-→ Document
-→ Elements
-→ Views
-→ UIDocument.Selection
-→ native ParameterFilterElement state
-→ transaction rules
-→ host event lifecycle
+Document
+Elements
+Views
+UIDocument.Selection
+ParameterFilterElement
+правил транзакций
+жизненного цикла событий Revit
 ```
 
-Плагин не владеет исходной геометрией или параметрами элементов и не должен произвольно изменять их как часть filter workflow.
+Плагин не владеет исходной геометрией или параметрами элементов и не должен произвольно изменять их как часть сценария фильтрации.
 
 ## Граница UI ↔ Revit API
 
-WPF не может безопасно обращаться к Revit API как к обычному async backend.
-
-Поэтому системная граница выглядит так:
+WPF не может безопасно обращаться к Revit API как к обычному асинхронному сервису.
 
 ```text
-WPF interaction
-→ Application request
-→ IRevitGateway / request queue
+Действие пользователя в WPF
+→ запрос Application
+→ IRevitGateway / очередь запросов
 → ExternalEvent
-→ valid Revit API context
-→ response
-→ UI feedback
+→ допустимый контекст Revit API
+→ ответ
+→ сообщение в интерфейсе
 ```
 
-`ExternalEvent` здесь не является бизнес-операцией. Это механизм безопасного пересечения host boundary.
+`ExternalEvent` — не бизнес-операция, а механизм безопасного пересечения границы Revit.
 
-## Клиентская фильтрация и native filter
-
-Два представления фильтра нужно разделять:
+## Клиентская фильтрация и штатный фильтр
 
 ```text
 FilterDefinition
-→ канонический пользовательский intent
+→ канонический смысл пользовательского фильтра
 
 ParameterFilterElement
-→ возможное native-представление части этого intent
+→ возможное штатное представление части этого смысла
 ```
 
-Не каждый корректный ContextFilter filter обязан быть представим штатным Revit filter.
+Не каждый корректный фильтр ContextFilter обязан быть представим штатным фильтром Revit.
 
-## Persistence boundary
+## Граница хранения
 
-Настройки, presets и history хранятся вне Revit document в `%AppData%\ContextFilter`.
-
-Они принадлежат плагину, но не являются подтверждением текущего состояния документа. Persisted intent может быть повторно применён к новому Revit context только после нового разрешения параметров и вычисления результата.
+Настройки, пресеты и история хранятся вне Revit-документа в `%AppData%\ContextFilter`. Сохранённые условия фильтра можно применять к новому контексту только после повторного разрешения параметров и нового вычисления результата.

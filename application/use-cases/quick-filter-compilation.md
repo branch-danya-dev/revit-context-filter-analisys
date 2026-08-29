@@ -1,32 +1,23 @@
-# Quick filter compilation
+# Компиляция быстрого фильтра
 
-Quick filter — Application-механизм компиляции простого пользовательского выбора в canonical Domain filter tree.
+Быстрый фильтр — механизм Application для преобразования простого пользовательского выбора в каноническое дерево Domain.
 
 ```text
-selected parameter
-+ selected values
-+ combine mode
-        ↓
-BuildQuickFilterUseCase
-        ↓
-FilterDefinition
+выбранный параметр
++ выбранные значения
++ способ объединения
+→ BuildQuickFilterUseCase
+→ FilterDefinition
 ```
 
-Подтверждённые правила компиляции:
+Подтверждённые правила:
 
 - `__missing__` → `NotExists`;
 - `__empty__` → `IsEmpty`;
 - одно обычное значение → `Equals`;
-- несколько значений в OR-сценарии → `InList`;
+- несколько значений в OR → `InList`;
 - несколько значений при `combineValuesWithAnd=true` → AND-группа из `Equals`.
 
-## Почему это Application
+UI знает, что отметил пользователь. Domain знает смысл операторов. Application связывает эти уровни и строит правильную Domain-структуру.
 
-UI знает, что пользователь отметил значения. Domain знает, что означают `Equals`, `InList`, AND и `NotExists`. Application связывает эти два уровня и строит правильную Domain-структуру.
-
-```text
-UI representation
-!= filter semantics
-```
-
-Quick filter не является альтернативным фильтрующим движком. После компиляции результат должен проходить через тот же evaluation pipeline, что и вручную построенное сложное дерево.
+Быстрый фильтр не является отдельным движком: после компиляции используется та же цепочка вычисления.

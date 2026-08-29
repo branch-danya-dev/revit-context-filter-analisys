@@ -1,14 +1,10 @@
-# Domain · Parameters
+# Domain · Параметры
 
-`parameters/` описывает **что считается параметром в filter semantics**, как сохраняется его identity и как различаются источник, значение и отображение.
+`parameters/` описывает, **что считается параметром в семантике фильтра**, как сохраняется его идентичность и как различаются источник, значение и отображение.
 
-## Документы
-
-- [`parameter-identity.md`](parameter-identity.md) — `ParameterKey`, identity kind и source;
-- [`value-model.md`](value-model.md) — `ParameterValue`, typed value и состояния missing/empty;
+- [`parameter-identity.md`](parameter-identity.md) — `ParameterKey`, вид идентичности и источник;
+- [`value-model.md`](value-model.md) — `ParameterValue`, типизированное значение и состояния отсутствия/пустоты;
 - [`synthetic-parameters.md`](synthetic-parameters.md) — Category, Family, TypeName и другие вычисляемые свойства.
-
-## Основная модель
 
 ```text
 ParameterKey
@@ -16,23 +12,12 @@ ParameterKey
 ├─ IdentityValue
 └─ Source
 
-ParameterKey
-↓
-ParameterValue
-
-ParameterKey
-↓
-DisplayName
+ParameterKey → ParameterValue
+ParameterKey → DisplayName
 ```
 
-Три связи намеренно разделены.
-
-## Канонический принцип
-
 ```text
-parameter label
-!=
-parameter identity
-!=
-parameter value
+подпись параметра
+!= идентичность параметра
+!= значение параметра
 ```

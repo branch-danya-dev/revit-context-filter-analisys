@@ -1,22 +1,18 @@
-# Actions
+# Действия
 
-Application actions начинаются после получения matched element set.
+Действия Application начинаются после получения найденного набора элементов.
 
-Эта область не вызывает Revit API. Она вычисляет нужный target set и orchestrates вызов output port.
+Эта область не вызывает Revit API. Она рассчитывает нужный целевой набор и координирует вызов выходного порта.
 
-## Документы
-
-- [`selection-and-visibility-calculation.md`](selection-and-visibility-calculation.md) — set calculations;
-- [`action-orchestration.md`](action-orchestration.md) — переход от filter result к host action.
-
-## Граница
+- [`selection-and-visibility-calculation.md`](selection-and-visibility-calculation.md) — расчёт множеств;
+- [`action-orchestration.md`](action-orchestration.md) — переход от результата фильтра к действию в Revit.
 
 ```text
-matched set
-→ Application calculation
-→ target intent
+найденный набор
+→ расчёт Application
+→ целевой набор / намерение действия
 → IRevitGateway
-→ Revit side effect
+→ действие в Revit
 ```
 
-`FilterResult` и результат Revit action — разные состояния.
+`FilterResult` и результат выполнения действия в Revit — разные состояния.

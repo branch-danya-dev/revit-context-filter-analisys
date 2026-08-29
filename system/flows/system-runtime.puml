@@ -1,30 +1,30 @@
 @startuml
-actor User
+actor "Пользователь" as User
 participant UI
 participant Application
-participant RevitLayer as "Revit layer"
+participant RevitLayer as "Слой Revit"
 participant Revit as "Autodesk Revit"
 participant Domain
 
-User -> UI : Open filter / choose scope
+User -> UI : открыть фильтр / выбрать область
 UI -> Application : CollectContext
-Application -> RevitLayer : request collection
-RevitLayer -> Revit : collect elements
-Revit --> RevitLayer : ids / parameters / host context
-RevitLayer --> Application : records / snapshots
-Application -> Domain : build semantic representations
-Application --> UI : tree / parameters / values
+Application -> RevitLayer : запросить сбор
+RevitLayer -> Revit : собрать элементы
+Revit --> RevitLayer : ids / параметры / контекст
+RevitLayer --> Application : записи / снимки
+Application -> Domain : построить семантические представления
+Application --> UI : дерево / параметры / значения
 
-User -> UI : choose conditions
+User -> UI : выбрать условия
 UI -> Application : BuildQuickFilter / Evaluate
 Application -> Domain : FilterDefinition + snapshots
-Domain --> Application : semantic models
+Domain --> Application : модели
 Application --> UI : FilterResult
 
-User -> UI : Select / Hide / Isolate / Native Filter
-UI -> Application : action request
-Application -> RevitLayer : resolved action set
-RevitLayer -> Revit : ExternalEvent / transaction if required
-Revit --> RevitLayer : action result
-RevitLayer --> UI : feedback
+User -> UI : выделить / скрыть / изолировать / создать штатный фильтр
+UI -> Application : запрос действия
+Application -> RevitLayer : рассчитанный набор
+RevitLayer -> Revit : ExternalEvent / транзакция при необходимости
+Revit --> RevitLayer : результат действия
+RevitLayer --> UI : сообщение
 @enduml

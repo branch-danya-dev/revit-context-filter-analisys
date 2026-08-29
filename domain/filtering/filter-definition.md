@@ -1,8 +1,6 @@
-# Filter Definition
+# FilterDefinition
 
-`FilterDefinition` — корневая domain-структура пользовательского filter intent.
-
-Подтверждённая модель:
+`FilterDefinition` — корневая структура Domain для пользовательских условий фильтра.
 
 ```text
 FilterDefinition
@@ -11,46 +9,31 @@ FilterDefinition
 └─ SelectedCategoryKeys
 ```
 
-## Семантика
-
-Фильтр отвечает на три вопроса:
+Он отвечает на три вопроса:
 
 ```text
-ГДЕ искать?
-→ Scope
-
-КАКОЙ category/type context учитывать?
-→ SelectedCategoryKeys
-
-КАКИЕ условия должны быть истинны?
-→ RootGroup
+ГДЕ искать? → Scope
+КАКОЙ контекст категории/типа учитывать? → SelectedCategoryKeys
+КАКИЕ условия должны быть истинны? → RootGroup
 ```
-
-## FilterDefinition не является результатом
 
 ```text
 FilterDefinition
-+ Candidate Set
-→ evaluation
++ множество кандидатов
+→ вычисление
 → FilterResult
 ```
 
-Один и тот же definition может дать разные результаты для разных candidate sets или разных состояний Revit-модели.
+Один и тот же `FilterDefinition` может дать разные результаты для разных контекстов или состояний Revit-модели.
 
-## FilterDefinition не является UI state
+Быстрый фильтр, отмеченные значения и WPF-контролы могут порождать `FilterDefinition`, но после компиляции каноническим смыслом является модель Domain.
 
-Quick filter, checked values и WPF controls могут **порождать** `FilterDefinition`, но каноническим смыслом после компиляции является domain definition.
-
-## FilterDefinition не является native Revit filter
-
-Native `ParameterFilterElement` — только одна возможная техническая реализация части filter intent.
-
-Некоторые корректные domain filters могут не иметь эквивалентного native representation.
+Штатный `ParameterFilterElement` — только одно возможное техническое представление части фильтра.
 
 ## Инварианты
 
-1. Filter intent должен быть выражаем без зависимости от Revit API objects.
-2. Scope является частью intent.
-3. Логическая структура условий должна сохраняться, а не заменяться плоским списком.
-4. Selected category context должен быть отделён от parameter conditions.
-5. Изменение evaluation strategy не должно менять смысл definition.
+1. Условия выражаются без зависимости от объектов Revit API.
+2. `Scope` является частью определения.
+3. Логическая структура сохраняется, а не заменяется плоским списком.
+4. Категории отделены от условий параметров.
+5. Изменение способа вычисления не меняет смысл определения.

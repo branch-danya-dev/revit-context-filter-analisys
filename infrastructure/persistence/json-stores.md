@@ -1,51 +1,34 @@
-# JSON stores
+# JSON-хранилища
 
-Infrastructure реализует Application storage ports через локальные JSON-файлы.
+Infrastructure реализует порты хранения Application через локальные JSON-файлы.
 
-## `JsonSettingsStore`
-
-Назначение:
+## JsonSettingsStore
 
 ```text
 settings.json
-→ deserialize
-→ sanitize
-→ runtime settings
+→ десериализация
+→ Sanitize()
+→ рабочие настройки
 ```
 
-Ключевой факт: настройки могут быть вручную изменены или содержать некорректные значения, поэтому чтение файла не завершает validation boundary.
-
-## `JsonPresetStore`
-
-Назначение:
+## JsonPresetStore
 
 ```text
 PresetDefinition[]
-↔ persisted preset document
+↔ сохранённый документ пресетов
 ```
 
-Store поддерживает schema migration и использует `AtomicFileWriter` для безопасной замены файла.
+Хранилище поддерживает миграцию схемы и использует `AtomicFileWriter`. Смысл `Full` и `Template` принадлежит Domain.
 
-Semantic distinctions `Full` и `Template` принадлежат Domain; Infrastructure лишь сохраняет их representation.
+## JsonFilterHistoryStore
 
-## `JsonFilterHistoryStore`
-
-Хранит recent filter history.
-
-Подтверждённые mechanics:
-
-- deduplication по signature;
-- ограничение количества записей через `HistoryMaxItems`.
-
-## Границы ошибок
-
-Infrastructure должен различать:
+Хранит недавнюю историю фильтров. Подтверждены устранение дублей по сигнатуре и ограничение размера через `HistoryMaxItems`.
 
 ```text
-no persisted data
-!= unreadable persisted data
-!= invalid persisted data
-!= valid empty collection
+нет сохранённых данных
+!= данные невозможно прочитать
+!= данные некорректны
+!= корректная пустая коллекция
 ```
 
-Точная политика восстановления каждого I/O failure в предоставленном source analysis полностью не описана, поэтому здесь она не выдумывается.
+Полная политика восстановления после каждой I/O-ошибки в источнике не описана и здесь не выдумывается.

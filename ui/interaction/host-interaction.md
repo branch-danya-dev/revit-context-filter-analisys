@@ -1,50 +1,40 @@
-# Host interaction
+# Взаимодействие со средой Revit
 
-ContextFilter lives inside Autodesk Revit, поэтому UI gestures должны сосуществовать с native interaction model host-приложения.
+ContextFilter работает внутри Autodesk Revit, поэтому дополнительные жесты интерфейса должны сосуществовать со штатной моделью взаимодействия Revit.
 
-## Launch
+## Запуск
 
-В финальном delivery flow плагин не должен автоматически открывать тяжёлую UI session при старте Revit. Основной запуск выполняется через Ribbon.
+В итоговом сценарии плагин не открывает тяжёлую рабочую сессию автоматически при старте Revit. Основной запуск выполняется через Ribbon.
 
-## Hotkeys
+## Горячие клавиши
 
-Hotkeys являются opt-in feature.
+Горячие клавиши включаются пользователем.
 
 История тестирования:
 
 ```text
 Ctrl + Click
-→ conflict with Revit multi-selection
-→ replaced during testing with Ctrl + Shift + Click
-→ later source state constrains/disables this gesture
+→ конфликт со штатным множественным выделением Revit
+→ во время тестирования заменён на Ctrl + Shift + Click
+→ в последующем состоянии исходного кода конфликтующий жест ограничен / отключён
 ```
 
-В source-derived финальном состоянии:
+В итоговом состоянии, подтверждённом анализом исходного кода:
 
-- `Shift+F` может открывать фильтр при включённых hotkeys;
-- Double `F` поддерживается при включённых hotkeys;
-- `Ctrl+Shift+Click` отмечен как disabled из-за конфликта с multi-select.
+- `Shift+F` может открывать фильтр при включённых горячих клавишах;
+- двойное `F` поддерживается при включённых горячих клавишах;
+- `Ctrl+Shift+Click` отмечен как отключённый из-за конфликта с множественным выделением.
 
-Поэтому каноническое правило важнее конкретной клавиши:
+> Дополнительная клавиша плагина не должна перехватывать или неоднозначно переопределять штатное выделение Revit.
 
-> Plugin shortcut must not steal or ambiguously redefine established Revit selection semantics.
+## Безопасное поведение по умолчанию
 
-## Calm interaction defaults
-
-В schema v2 по умолчанию выключены:
-
-- auto-refresh;
-- dynamic highlight;
-- hotkeys.
-
-Это отражает правило:
+В схеме настроек v2 по умолчанию выключены автоматическое обновление, динамическое выделение и горячие клавиши.
 
 ```text
-convenience
-must not imply
-continuous host activity
+удобство
+не должно означать
+постоянную активность внутри Revit
 ```
 
-## Ownership
-
-UI владеет тем, как возможность представлена пользователю и включена/выключена. Low-level keyboard hooks, foreground detection и host event mechanics принадлежат `revit/`.
+UI владеет представлением и включением возможности. Низкоуровневые клавиатурные перехватчики, проверка активного окна и события Revit принадлежат `revit/`.

@@ -1,108 +1,57 @@
-# Data Ownership and Movement
+# Владение данными и их движение
 
-## 1. Revit source state
+## 1. Исходное состояние Revit
 
-Authority: Autodesk Revit.
+Источник истины: Autodesk Revit.
 
-Сюда относятся:
+Сюда относятся `Document`, `Element` / `ElementId`, активный `View`, выделение, штатные параметры, `ParameterFilterElement`, транзакции и события Revit.
 
-- Document;
-- Element / ElementId;
-- active View;
-- selection;
-- native parameters;
-- native `ParameterFilterElement`;
-- host transaction / event state.
+## 2. Семантическое состояние Domain
 
-ContextFilter может читать или через разрешённые API изменять отдельные части host state, но не становится их источником истины.
+Domain владеет смыслом `FilterDefinition`, `FilterGroup` / `FilterCondition`, `ParameterKey`, контракта `ElementSnapshot`, `FilterResult` и `PresetDefinition`.
 
-## 2. Domain semantic state
+Эти модели не обязаны иметь прямой аналог в Revit API.
 
-Authority для смысла: Domain.
+## 3. Производное рабочее состояние
 
-Ключевые модели:
+Вычисляется из Revit и правил Domain/Application:
 
-- `FilterDefinition`;
-- `FilterGroup` / `FilterCondition`;
-- `ParameterKey`;
-- `ElementSnapshot` contract;
-- `FilterResult`;
-- `PresetDefinition`.
+- идентификаторы кандидатов;
+- дерево Категория → Семейство → Тип;
+- индекс параметров и значения;
+- инвертированные индексы;
+- снимки элементов;
+- текущий `FilterResult`.
 
-Эти модели не обязаны иметь прямой one-to-one аналог в Revit API.
+Производное состояние можно отбросить и пересобрать, поэтому кэш не является источником истины.
 
-## 3. Derived runtime state
+## 4. Состояние UI
 
-Вычисляется из Revit source state и Domain/Application rules:
+Интерфейс хранит выбранную область, отмеченные узлы, выбранные параметры/значения, состояние выполнения, сообщения и выбранные пресеты. Это представление пользовательской сессии, а не состояние Revit.
 
-- candidate ElementIds;
-- Category → Family → Type tree;
-- parameter index;
-- parameter values;
-- inverted indexes;
-- cached snapshots;
-- current FilterResult.
+## 5. Сохранённое состояние плагина
 
-```text
-Revit source state
-→ derive
-→ runtime projection
-```
-
-Derived state может быть отброшен и пересобран. Поэтому cache не является source authority.
-
-## 4. UI state
-
-UI хранит пользовательскую рабочую сессию:
-
-- выбранный scope;
-- отмеченные tree nodes;
-- выбранный parameter/value;
-- видимость панели;
-- progress / feedback state;
-- локальное состояние interaction.
-
-UI state может отражать Domain/Application state, но не определяет Revit truth.
-
-## 5. Persisted plugin state
-
-Хранится в `%AppData%\ContextFilter`:
-
-```text
-settings.json
-presets.json
-recent.json
-logs/
-```
-
-Ownership:
-
-- settings → Infrastructure persistence of plugin configuration;
-- presets → persisted reusable user intent;
-- recent → filter history;
-- logs → diagnostic evidence.
-
-Persisted configuration проходит validation / normalization перед использованием. Файл на диске не считается автоматически доверенным runtime state.
+В `%AppData%\ContextFilter` находятся `settings.json`, `presets.json`, `recent.json`, `logs/`. Сохранённая конфигурация проходит проверку и нормализацию перед использованием.
 
 ## Движение данных
 
 ```text
 REVIT
-  ↓ collect
-DOMAIN REPRESENTATIONS
-  ↓ application processing
-DERIVED RUNTIME STATE
-  ↓ presentation
+  ↓ сбор
+ПРЕДСТАВЛЕНИЯ DOMAIN
+  ↓ обработка Application
+ПРОИЗВОДНОЕ СОСТОЯНИЕ
+  ↓ представление
 UI
 
-UI intent
+Условия пользователя
   ↓
 DOMAIN / APPLICATION
-  ↓ optional persistence
+  ↓ при необходимости сохранить
 INFRASTRUCTURE
 
 FilterResult
-  ↓ action request
+  ↓ запрос действия
 REVIT
 ```
 
@@ -110,8 +59,8 @@ REVIT
 
 ```text
 Element != ElementSnapshot
-Parameter label != ParameterKey
-Preset != FilterResult
-Cache != Revit authority
-Persisted setting != validated runtime setting
+Отображаемое имя != ParameterKey
+PresetDefinition != FilterResult
+Кэш != источник истины Revit
+Сохранённая настройка != проверенная рабочая настройка
 ```

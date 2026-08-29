@@ -1,8 +1,6 @@
-# Cache and invalidation
+# Кэш и инвалидация
 
 Application использует многоуровневый `ContextCollectionCache`.
-
-Подтверждённая зависимость уровней:
 
 ```text
 IDs
@@ -14,26 +12,18 @@ Index + Snapshots
 FilterResult
 ```
 
-| Tier | Содержимое | Инвалидация |
+| Уровень | Содержимое | Причина инвалидации |
 |---|---|---|
-| IDs | `ElementIds` + cache key | view / selection / model change |
-| Tree | `ContextNode[]` | при invalidation IDs |
-| Index | parameter index + snapshots | при invalidation Tree или значительном model change |
-| Filter | `FilterResult` | при invalidation Index или изменении `FilterDefinition` |
+| IDs | `ElementIds` + ключ контекста | вид / выделение / изменение модели |
+| Tree | `ContextNode[]` | инвалидация IDs |
+| Index | индекс параметров + снимки | инвалидация Tree или значительное изменение модели |
+| Filter | `FilterResult` | инвалидация Index или изменение `FilterDefinition` |
 
-## Смысл
-
-Кэш хранит derived state и ускоряет повторные вычисления. Он не меняет ownership данных.
+Кэш хранит производное состояние и ускоряет повторные вычисления. Он не меняет владельца данных.
 
 ```text
-cache hit
-!= source authority
+данные найдены в кэше
+!= источник Revit подтверждён как актуальный
 ```
 
-## Responsibility split
-
-- Application определяет зависимость derived tiers;
-- Revit сообщает host lifecycle/model changes и обеспечивает source recollection;
-- UI решает, как показывать stale/progress state.
-
-Конкретные thresholds и Idling/chunking относятся к runtime/Revit realization и не являются семантикой этого документа.
+Application определяет зависимости уровней; Revit сообщает об изменениях среды; UI показывает прогресс и актуальное состояние. Конкретные пороги и порционный сбор принадлежат реализации Revit.

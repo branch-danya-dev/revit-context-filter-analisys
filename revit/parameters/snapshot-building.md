@@ -1,50 +1,22 @@
-# Snapshot building
+# Построение ElementSnapshot
 
-`RevitElementSnapshotBuilder` преобразует live Revit elements в `ElementSnapshot`, который далее может использоваться клиентским filter engine без постоянного обращения к Revit API.
-
-## Двухэтапная модель
-
-Implementation analysis подтверждает:
+`RevitElementSnapshotBuilder` преобразует живые элементы Revit в `ElementSnapshot`, пригодный для клиентского движка фильтрации без постоянного обращения к Revit API.
 
 ```text
 Revit Element
-↓
-light snapshot
-  category
-  family
-  type
-↓
-lazy parameter load when needed
-↓
-parameter-complete snapshot/index data
+→ лёгкий снимок
+   категория / семейство / тип
+→ отложенная загрузка параметров при необходимости
+→ данные снимка / индекса с параметрами
 ```
 
-## Зачем light snapshot
-
-Пользователь сначала работает с контекстом и Category → Family → Type. Читать полный набор параметров каждого элемента заранее может быть дорого на больших моделях.
-
-Поэтому deeper parameter data загружается по необходимости.
-
-## Семантическое следствие
+Чтение полного набора параметров каждого элемента заранее может быть дорого на больших моделях, поэтому глубокие данные загружаются по требованию.
 
 ```text
-parameter not loaded yet
-!= parameter missing in Revit
+параметр ещё не загружен
+!= параметр отсутствует в Revit
 ```
 
-Revit layer должен отличать отсутствие загруженной информации от подтверждённого отсутствия source parameter.
+`ElementSnapshot` — производное представление и не является источником истины Revit. После изменения документа снимок может стать устаревшим, даже если объект остаётся в памяти.
 
-## Authority
-
-`ElementSnapshot` — derived representation.
-
-```text
-ElementSnapshot
-!= Revit Element authority
-```
-
-Если Revit document изменился, snapshot может стать stale независимо от того, что его объект всё ещё существует в памяти.
-
-## Type parameters
-
-Реализация использует `RevitTypeParameterCache` для повторного использования type-level reads. Это performance mechanism и не меняет различие `Instance` / `Type` в Domain `ParameterSource`.
+`RevitTypeParameterCache` повторно использует чтение параметров типа; это механизм производительности, не меняющий различие `Instance` / `Type` в `ParameterSource`.

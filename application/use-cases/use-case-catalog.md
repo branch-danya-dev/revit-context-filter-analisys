@@ -1,38 +1,32 @@
-# Use case catalog
+# Каталог сценариев использования
 
-Подтверждённые реализацией Application use cases:
-
-| Use case | Ответственность |
+| Сценарий | Ответственность |
 |---|---|
-| `CollectContextUseCase` | выбрать доступный collection scope и инициировать получение контекста |
-| `BuildContextTreeUseCase` | построить Category → Family → Type projection из `ElementTreeRecord[]` |
-| `BuildParameterIndexUseCase` | построить каталог доступных параметров для snapshots |
+| `CollectContextUseCase` | выбрать доступную область и инициировать получение контекста |
+| `BuildContextTreeUseCase` | построить Категория → Семейство → Тип из `ElementTreeRecord[]` |
+| `BuildParameterIndexUseCase` | построить каталог параметров для снимков |
 | `BuildParameterValuesUseCase` | получить уникальные значения выбранного параметра |
 | `BuildQuickFilterUseCase` | преобразовать выбор параметра/значений в `FilterDefinition` |
-| `BuildPresetUseCase` | преобразовать текущее filter state в `PresetDefinition` |
-| `SavePresetUseCase` | передать preset в persistence port |
-| `DeletePresetUseCase` | удалить preset через store port |
-| `ListPresetsUseCase` | прочитать доступные presets |
-| `EnsureBuiltInPresetsUseCase` | обеспечить наличие встроенных templates |
-
-## Группы сценариев
+| `BuildPresetUseCase` | преобразовать текущее состояние фильтра в `PresetDefinition` |
+| `SavePresetUseCase` | передать пресет в порт хранения |
+| `DeletePresetUseCase` | удалить пресет через порт хранилища |
+| `ListPresetsUseCase` | прочитать доступные пресеты |
+| `EnsureBuiltInPresetsUseCase` | обеспечить наличие встроенных шаблонов |
 
 ```text
-Context preparation
+Подготовка контекста
 → CollectContext
 → BuildContextTree
 → BuildParameterIndex
 → BuildParameterValues
 
-Filter intent
+Условия фильтра
 → BuildQuickFilter
 
-Reusable intent
+Повторное использование
 → BuildPreset
 → Save / List / Delete
 → EnsureBuiltInPresets
 ```
 
-## Граница
-
-Use cases управляют последовательностью действий. Они не становятся authority для Revit model state и не заменяют Domain definitions.
+Сценарии управляют последовательностью действий, но не становятся источником истины для состояния Revit и не заменяют определения Domain.

@@ -1,32 +1,24 @@
-# Action orchestration
+# Координация действия
 
-После evaluation Application связывает semantic result с выбранным пользователем действием.
+После вычисления фильтра Application связывает `FilterResult` с выбранным пользователем действием.
 
 ```text
 FilterResult
-        ↓
-action intent
-        ↓
-optional set calculation / compatibility check
-        ↓
-IRevitGateway
-        ↓
-response
+→ намерение действия
+→ при необходимости расчёт множества / проверка совместимости
+→ IRevitGateway
+→ ответ
 ```
 
-Подтверждённые output operations через `IRevitGateway`:
+Через `IRevitGateway` подтверждены операции применения выделения, временной видимости и штатного фильтра.
 
-- apply selection;
-- apply temporary visibility;
-- apply native filter.
+Для штатного фильтра перед изменением Revit выполняется анализ совместимости.
 
-Для native filter перед side effect выполняется compatibility analysis.
+## Граница ошибки
 
-## Failure boundary
-
-Успешный `FilterResult` не гарантирует успешный host action. Ошибка, несовместимость native filter или host restriction должны возвращаться как action outcome, а не менять задним числом смысл matched set.
+Успешный `FilterResult` не гарантирует успешное действие в Revit. Ошибка среды, несовместимость штатного фильтра или текущее ограничение Revit должны возвращаться как результат действия, а не менять задним числом смысл найденного набора.
 
 ```text
-filter success
-!= action success
+успех фильтрации
+!= успех действия
 ```

@@ -1,35 +1,29 @@
-# Hotkeys and host interaction
+# Горячие клавиши и взаимодействие с Revit
 
-`HotkeyService` является Revit-specific integration, потому что shortcut должен учитывать foreground host и native Revit interaction semantics.
+`HotkeyService` является специфичной для Revit интеграцией: сочетание должно учитывать активное окно и штатную семантику ввода Revit.
 
-## Current source-derived behavior
+## Итоговое поведение по анализу исходного кода
 
-Hotkeys являются opt-in через `HotkeysEnabled` и по умолчанию выключены.
+Горячие клавиши включаются через `HotkeysEnabled` и по умолчанию выключены.
 
-Подтверждённые combinations:
-
-| Gesture | Behavior |
+| Сочетание | Поведение |
 |---|---|
-| `Shift+F` | открыть ContextFilter, если hotkeys включены |
-| Double `F` | открыть ContextFilter, если hotkeys включены |
-| `Ctrl+Shift+Click` | disabled в текущем source-derived состоянии из-за конфликта с multi-select |
+| `Shift+F` | открыть ContextFilter, если горячие клавиши включены |
+| двойное `F` | открыть ContextFilter, если горячие клавиши включены |
+| `Ctrl+Shift+Click` | отключено в текущем состоянии из-за конфликта с множественным выделением |
 
-Реализация использует low-level keyboard hooks только когда Revit находится на переднем плане.
+Реализация использует низкоуровневые клавиатурные перехватчики только когда Revit находится на переднем плане.
 
-## Evolution
+## Развитие
 
-Во время тестирования первоначальный `Ctrl+Click` конфликтовал с native Revit multi-selection. Он был заменён на `Ctrl+Shift+Click`, а дальнейшая стабилизация сделала hotkeys opt-in и ограничила конфликтный gesture.
+Во время тестирования первоначальный `Ctrl+Click` конфликтовал со штатным множественным выделением Revit. Он был заменён на `Ctrl+Shift+Click`, а дальнейшая стабилизация сделала горячие клавиши включаемыми пользователем и ограничила конфликтующий жест.
 
-## Системный принцип
-
-> Plugin convenience не должен незаметно красть established host semantics.
+> **Удобство плагина не должно незаметно забирать или переопределять штатную семантику ввода Revit.**
 
 ```text
-plugin shortcut
-must coexist with
-Revit native selection/input model
+дополнительная горячая клавиша
+должна сосуществовать со
+штатной моделью выбора и ввода Revit
 ```
 
-## Lifecycle
-
-Hooks не должны означать постоянную тяжёлую активность плагина. User-session lifecycle и foreground Revit context ограничивают их полезную область работы.
+Горячие клавиши не означают постоянную тяжёлую активность; полезная работа ограничивается активной пользовательской сессией и контекстом Revit.

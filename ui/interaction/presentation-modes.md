@@ -1,36 +1,28 @@
-# Presentation modes
+# Режимы представления
 
-ContextFilter supports two UI presentation modes over the same underlying workflow.
+ContextFilter поддерживает два способа отображения одного и того же рабочего сценария.
 
 ## DockablePane
 
-`DockablePane` is the default mode in the delivered implementation and is treated as the more stable Revit 2025 presentation path.
+`DockablePane` — основной режим в итоговой реализации и более стабильный путь представления внутри Revit 2025.
 
-It is suitable for a persistent working session where the user repeatedly changes context, parameters and actions without reopening the tool.
+Он подходит для длительной рабочей сессии, когда пользователь многократно меняет контекст, параметры и действия без повторного открытия инструмента.
 
 ## FloatingWindow
 
-`FloatingWindow` is an alternative presentation implemented through `MainFilterWindow` / `FilterWindowService`.
+`FloatingWindow` — альтернативное представление через `MainFilterWindow` / `FilterWindowService`.
 
-It changes window behavior and placement, not the semantics of filtering or actions.
-
-## Invariant
+Оно меняет поведение и размещение окна, но не семантику фильтрации или действий.
 
 ```text
-presentation mode
-!= system mode
+способ представления
+!= режим работы системы
 ```
 
-Changing DockablePane ↔ FloatingWindow must not change:
+Переход DockablePane ↔ FloatingWindow не должен менять смысл `CollectionScope`, `FilterDefinition`, результат вычисления, пресеты или действия в Revit.
 
-- `CollectionScope` meaning;
-- `FilterDefinition`;
-- evaluation result;
-- preset meaning;
-- Revit action semantics.
+## Жизненный цикл представления
 
-## Lifecycle note
+Поскольку ContextFilter работает внутри Revit/WPF, присоединение и отсоединение UI влияет на устойчивость. В анализе исходного кода зафиксирован сценарий сбоя DockablePane и исправление: полное подключение UI выполняется из `ExternalCommand`, а не из `Idling`.
 
-Because ContextFilter runs inside Revit/WPF, UI attach/detach behavior is part of stability. Source analysis records a dockable-pane crash scenario and the correction that full UI attach is performed from an `ExternalCommand`, not opportunistically from `Idling`.
-
-The Revit-side attach mechanics belong to `revit/`; this document only records the presentation invariant that a view must not trigger unsafe host work merely by existing or binding.
+Механика Revit принадлежит `revit/`; здесь канонично правило, что существование или связывание представления само по себе не должно запускать небезопасную работу в среде.

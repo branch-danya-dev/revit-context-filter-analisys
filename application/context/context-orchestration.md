@@ -1,34 +1,23 @@
-# Context orchestration
+# Получение и подготовка контекста
 
-`CollectContextUseCase` выбирает scope с учётом доступности и запускает получение контекста через Application boundary.
-
-```text
-requested CollectionScope
-        ↓
-availability check
-        ↓
-IRevitGateway.CollectContextAsync(...)
-        ↓
-RevitContextInfo / collected data
-        ↓
-derived projections
-```
-
-Подтверждённый пример: отсутствие открытого документа делает соответствующий сценарий недоступным; Application не должен пытаться компенсировать отсутствие host context.
-
-После получения candidate set Application может инициировать:
-
-1. построение Category → Family → Type tree;
-2. построение parameter index;
-3. загрузку values конкретного `ParameterKey`;
-4. дальнейшую filter evaluation.
-
-## Важная граница
+`CollectContextUseCase` принимает `CollectionScope`, проверяет доступность сценария и запрашивает данные через Application-порт.
 
 ```text
-requested scope
-!= collected context
-!= derived tree/index
+запрошенный CollectionScope
+→ проверка доступности
+→ IRevitGateway.CollectContextAsync(...)
+→ сведения из Revit
+→ производные представления
 ```
 
-Domain определяет `CollectionScope`; Revit реализует физический сбор; Application связывает это в пользовательский workflow.
+Отсутствие открытого документа делает соответствующий сценарий недоступным; Application не должен изображать отсутствующий контекст как корректный пустой результат.
+
+После получения кандидатов Application может инициировать построение дерева, индекса параметров, значений выбранного `ParameterKey` и последующее вычисление фильтра.
+
+```text
+запрошенная область
+!= собранный контекст
+!= производное дерево / индекс
+```
+
+Domain определяет `CollectionScope`; Revit реализует физический сбор; Application связывает это в пользовательский сценарий.

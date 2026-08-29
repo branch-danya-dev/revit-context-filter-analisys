@@ -1,22 +1,16 @@
-# Use cases
+# Сценарии использования
 
-Use cases — входные точки Application для законченных пользовательских намерений.
+Сценарии использования — входные точки Application для законченных пользовательских намерений. Они связывают Domain-модели, сервисы Application и внешние порты, но не содержат Revit API или специфичную для WPF логику.
 
-Они связывают Domain-модели, Application services и внешние порты, но не содержат Revit API или WPF-specific behavior.
-
-## Карта
-
-- [`use-case-catalog.md`](use-case-catalog.md) — подтверждённый набор use cases;
-- [`quick-filter-compilation.md`](quick-filter-compilation.md) — преобразование UI-выбора в canonical `FilterDefinition`;
-- [`preset-lifecycle.md`](preset-lifecycle.md) — построение, сохранение, чтение и инициализация presets.
-
-## Правило
+- [`use-case-catalog.md`](use-case-catalog.md) — подтверждённый набор сценариев;
+- [`quick-filter-compilation.md`](quick-filter-compilation.md) — преобразование выбора интерфейса в `FilterDefinition`;
+- [`preset-lifecycle.md`](preset-lifecycle.md) — построение, сохранение, чтение и инициализация пресетов.
 
 ```text
-user intent
-→ use case
-→ domain/application operation
-→ result
+намерение пользователя
+→ сценарий использования
+→ операция Domain/Application
+→ результат
 ```
 
-Use case не является владельцем данных, которые он использует. Например, `BuildQuickFilterUseCase` создаёт `FilterDefinition`, но смысл этой модели принадлежит Domain.
+Сценарий не становится владельцем данных, которыми оперирует.

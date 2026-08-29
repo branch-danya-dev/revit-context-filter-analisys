@@ -1,15 +1,15 @@
 @startuml
 skinparam componentStyle rectangle
 
-title ContextFilter — Application flow
+title ContextFilter — цепочка Application
 
-actor User
+actor "Пользователь" as User
 component UI
-component "Application Use Cases" as UC
-component "Context / Projection Services" as CTX
+component "Сценарии Application" as UC
+component "Сервисы контекста / проекций" as CTX
 component "FilterEvaluator" as FE
-component "Action Calculators" as AC
-component "Application Ports" as Ports
+component "Расчёт действий" as AC
+component "Порты Application" as Ports
 component Domain
 component Revit
 component Infrastructure
@@ -18,23 +18,23 @@ User --> UI
 UI --> UC
 UC --> Domain
 UC --> CTX
-CTX --> Ports : collect / index / values
-CTX --> Domain : snapshots / context models
+CTX --> Ports : сбор / индекс / значения
+CTX --> Domain : снимки / модели контекста
 UC --> FE
 FE --> Domain : FilterDefinition / FilterResult
 UC --> AC
-AC --> Domain : action intent
+AC --> Domain : тип действия
 UC --> Ports
 Ports --> Revit
 Ports --> Infrastructure
 
 note right of FE
-Evaluation strategy is execution policy,
-not filter semantics.
+Способ вычисления — решение выполнения,
+а не семантика фильтра.
 end note
 
 note bottom of Ports
-Ports define required capabilities.
-Adapters own implementation details.
+Порты определяют требуемые возможности.
+Адаптеры владеют деталями реализации.
 end note
 @enduml

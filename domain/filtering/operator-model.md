@@ -1,51 +1,25 @@
-# Filter Operator Model
+# Модель операторов фильтра
 
-Domain определяет 19 операторов, сгруппированных по semantic family.
+Domain определяет 19 операторов:
 
 | Семейство | Операторы |
 |---|---|
-| Equality | `Equals`, `NotEquals` |
-| String | `Contains`, `NotContains`, `StartsWith`, `EndsWith` |
-| Presence / Empty | `IsEmpty`, `IsNotEmpty`, `Exists`, `NotExists` |
-| Numeric comparison | `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual` |
-| Range | `Between`, `NotBetween` |
-| Membership | `InList`, `NotInList` |
+| Равенство | `Equals`, `NotEquals` |
+| Строковые операции | `Contains`, `NotContains`, `StartsWith`, `EndsWith` |
+| Наличие / пустота | `IsEmpty`, `IsNotEmpty`, `Exists`, `NotExists` |
+| Числовое сравнение | `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual` |
+| Диапазон | `Between`, `NotBetween` |
+| Принадлежность списку | `InList`, `NotInList` |
 
-## Operator != execution method
-
-Оператор выражает semantic predicate.
-
-Как именно он вычисляется — sequential scan, parallel scan, inverted lookup или другой эквивалентный алгоритм — не относится к Domain.
-
-## Presence vs empty
+Оператор выражает логическое условие, а не способ его выполнения.
 
 ```text
-NotExists
-!= IsEmpty
-
-Exists
-!= IsNotEmpty
+NotExists != IsEmpty
+Exists != IsNotEmpty
 ```
 
-Эти пары задают разные вопросы о property state.
+`IgnoreCase` делает чувствительность к регистру частью условия фильтра.
 
-## String operators
+Источник подтверждает числовые и диапазонные операторы, но не фиксирует числовой допуск, точные правила преобразования, включённость границ `Between` и поведение для несовместимых `ParameterValueKind`. Эти детали намеренно не конкретизируются.
 
-`FilterCondition` содержит `IgnoreCase`, поэтому case sensitivity является частью filter condition semantics, а не только UI-настройкой.
-
-## Numeric and range operators
-
-Source analysis подтверждает наличие numeric/range operators, но не фиксирует все детали:
-
-- numeric tolerance;
-- точные conversion rules;
-- inclusivity границ `Between`;
-- поведение для несовместимого `ParameterValueKind`.
-
-Поэтому здесь они намеренно не конкретизируются без дополнительного evidence.
-
-## Native compatibility
-
-Корректный Domain operator не обязан иметь эквивалент в Revit `ElementFilter`.
-
-Compatibility — отдельный вопрос Application/Revit boundary.
+Корректный оператор Domain не обязан иметь эквивалент в Revit `ElementFilter`.

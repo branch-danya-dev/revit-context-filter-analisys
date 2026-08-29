@@ -1,39 +1,24 @@
-# Configuration
+# Конфигурация
 
-Этот раздел описывает жизненный цикл persisted settings и границу между сохранённой конфигурацией и безопасным runtime state.
-
-## Основная цепочка
+Этот раздел описывает жизненный цикл сохранённых настроек и границу между файлом конфигурации и безопасным рабочим состоянием.
 
 ```text
 settings.json
-→ deserialize
-→ migrate
-→ sanitize / normalize
-→ runtime configuration
+→ десериализация
+→ миграция
+→ проверка / нормализация
+→ рабочая конфигурация
 ```
 
-## Ответственность
-
-Infrastructure отвечает за:
-
-- чтение/запись settings document;
-- schema migration;
-- sanitization некорректных значений;
-- предоставление конфигурации через Application ports.
-
-Infrastructure не определяет, что означает конкретная Domain-модель или Revit operation.
-
-Подробнее:
+Infrastructure отвечает за чтение/запись настроек, миграцию схемы, нормализацию некорректных значений и предоставление конфигурации через порты Application.
 
 - [`settings-lifecycle.md`](settings-lifecycle.md)
 - [`sanitization.md`](sanitization.md)
 - [`calm-defaults.md`](calm-defaults.md)
 
-## Главный invariant
-
 ```text
-persisted value
-!= trusted runtime value
+сохранённое значение
+!= доверенное рабочее значение
 ```
 
-Пользовательский файл — это input boundary. Он может быть старой версии, вручную изменён, частично некорректен или содержать чрезмерные значения.
+Пользовательский файл может быть старой версии, вручную изменён или содержать чрезмерные значения.

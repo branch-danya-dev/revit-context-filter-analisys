@@ -1,20 +1,16 @@
-# Context orchestration
+# Координация контекста
 
-Эта область описывает, как Application превращает полученный от Revit candidate set в производные структуры, необходимые UI и filtering engine.
+Этот раздел описывает, как Application превращает полученный от Revit набор кандидатов в производные структуры, необходимые интерфейсу и движку фильтрации.
 
-## Документы
+- [`context-orchestration.md`](context-orchestration.md) — получение и подготовка контекста;
+- [`projection-pipeline.md`](projection-pipeline.md) — дерево, индекс параметров и значения;
+- [`cache-and-invalidation.md`](cache-and-invalidation.md) — зависимость уровней производного состояния.
 
-- [`context-orchestration.md`](context-orchestration.md) — путь получения и подготовки контекста;
-- [`projection-pipeline.md`](projection-pipeline.md) — tree, parameter index и parameter values;
-- [`cache-and-invalidation.md`](cache-and-invalidation.md) — многоуровневая зависимость derived state.
-
-## Граница
-
-Application не собирает `Element` через Revit API. Он запрашивает данные через порт и работает с Domain/Application representations.
+Application не собирает `Element` через Revit API. Он запрашивает данные через порт и работает с представлениями Domain/Application.
 
 ```text
-Revit collection
-→ port response
-→ Application projection/cache
-→ UI + filtering
+сбор в Revit
+→ ответ порта
+→ проекции / кэш Application
+→ UI + фильтрация
 ```

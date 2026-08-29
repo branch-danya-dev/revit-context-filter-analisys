@@ -1,97 +1,73 @@
 # Revit
 
-`ContextFilter.Revit` — host-adapter слой ContextFilter. Он связывает Domain/Application/UI с Autodesk Revit 2025 и владеет всеми ограничениями, которые появляются именно потому, что система выполняется внутри Revit.
+`ContextFilter.Revit` — слой-адаптер ContextFilter к Autodesk Revit 2025. Он связывает Domain/Application/UI со средой Revit и владеет ограничениями, возникающими именно из-за выполнения внутри Revit.
 
 ## Ответственность
 
-Revit layer отвечает за:
+Слой Revit отвечает за:
 
-- вход в Revit через `IExternalApplication` и ribbon command;
-- composition root приложения;
+- вход через `IExternalApplication` и команду Ribbon;
+- корень сборки зависимостей;
 - безопасный доступ к Revit API через `ExternalEvent`;
-- очередь и dispatch host requests;
-- сбор элементов из `Document` / `View` / текущего selection;
-- преобразование Revit elements/parameters в Domain representations;
-- реальные selection / visibility / native-filter actions;
-- соблюдение transaction requirements;
-- реакцию на Revit lifecycle events;
-- session-bound `Idling` work;
-- host-specific shutdown и hotkey integration.
+- очередь и диспетчеризацию запросов;
+- сбор элементов из `Document`, `View` и текущего выделения;
+- преобразование элементов/параметров Revit в модели Domain;
+- реальные действия над выделением, видимостью и штатными фильтрами;
+- соблюдение требований транзакций;
+- реакцию на события жизненного цикла Revit;
+- работу `Idling`, ограниченную активной пользовательской сессией;
+- завершение работы и интеграцию горячих клавиш.
 
-## Граница authority
+## Граница владения состоянием
 
 ```text
 Autodesk Revit
-→ authority for Document / Element / View / Selection
+→ источник истины для Document / Element / View / Selection
 
-ContextFilter Domain/Application
-→ authority for filter meaning and application workflow
+Domain / Application
+→ источник смысла фильтра и сценариев
 
 ContextFilter.Revit
-→ adapter between those authorities
+→ адаптер между этими областями
 ```
 
-Revit layer не определяет семантику `FilterDefinition`, `ParameterKey`, preset или action intent. Он должен корректно реализовать уже определённый смысл в рамках host API.
+Слой Revit не определяет семантику `FilterDefinition`, `ParameterKey`, пресета или типа действия. Он реализует уже определённый смысл в рамках ограничений Revit API.
 
-## Основной pipeline
+## Основная цепочка
 
 ```text
 UI / Application
-      ↓
-IRevitGateway
-      ↓
-RevitExternalEventDispatcher
-      ↓
-RevitRequestQueue
-      ↓
-ExternalEvent.Raise()
-      ↓
-ContextFilterExternalEventHandler
-      ↓
-RevitRequestDispatcher
-      ↓
-Revit service
-      ↓
-Revit API
-      ↓
-response
+→ IRevitGateway
+→ RevitExternalEventDispatcher
+→ RevitRequestQueue
+→ ExternalEvent.Raise()
+→ ContextFilterExternalEventHandler
+→ RevitRequestDispatcher
+→ сервис Revit
+→ Revit API
+→ ответ
 ```
 
-Revit API не thread-safe, поэтому этот pipeline является системной границей, а не просто технической обёрткой.
+Revit API не является потокобезопасным, поэтому эта цепочка — системная граница, а не просто обёртка.
 
 ## Структура
 
 ```text
 revit/
-├─ external-event/   → main-thread request pipeline
-├─ collection/       → host-side context collection
-├─ parameters/       → Revit ↔ Domain parameter translation
-├─ actions/          → реальные host-side effects
-├─ transactions/     → write execution boundary
-├─ lifecycle/        → startup, events, session, shutdown
-└─ diagrams/         → host integration view
+├─ external-event/   → запросы в главный поток Revit
+├─ collection/       → сбор рабочего контекста из Revit
+├─ parameters/       → перевод Revit ↔ Domain
+├─ actions/          → реальные изменения среды
+├─ transactions/     → граница записи
+├─ lifecycle/        → запуск, события, сессия, завершение
+└─ diagrams/         → схема интеграции с Revit
 ```
 
-Дополнительно [`composition-root.md`](composition-root.md) описывает `AddinHost` и сборку runtime dependencies.
-
-## Ключевые различия
-
 ```text
-Application port
-!= Revit adapter
-
-Domain action intent
-!= Revit API call
-
-valid filter
-!= native Revit filter
-
-UI async Task
-!= permission to access Revit API
-
-successful filter evaluation
-!= successful host mutation
-
-Document lifecycle
-!= plugin pane lifecycle
+Порт Application != адаптер Revit
+Тип действия Domain != вызов Revit API
+Корректный фильтр != штатный фильтр Revit
+Асинхронный Task UI != разрешение обращаться к Revit API
+Успешная фильтрация != успешное изменение Revit
+Жизненный цикл документа != жизненный цикл панели
 ```

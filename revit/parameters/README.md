@@ -1,35 +1,26 @@
-# Parameters
+# Параметры
 
-`parameters/` описывает адаптацию Autodesk Revit parameters к стабильной Domain-модели ContextFilter.
+`parameters/` описывает адаптацию параметров Autodesk Revit к стабильной модели Domain.
 
-## Подтверждённые компоненты
+Подтверждены:
 
-- `RevitElementSnapshotBuilder` — light snapshots + lazy parameter load;
-- `ParameterIndexService` — host-side support для index/values/inverted indexes;
-- `RevitParameterKeyFactory` — Revit Parameter ↔ Domain `ParameterKey`;
-- `RevitParameterValueConverter` — Revit value → Domain value;
-- `RevitSyntheticParameterProvider` — Category, Family, Level, Workset и другие synthetic properties;
-- `RevitTypeParameterCache` — reuse type-parameter reads.
-
-## Граница
+- `RevitElementSnapshotBuilder` — лёгкие снимки и отложенная загрузка параметров;
+- `ParameterIndexService` — поддержка индекса и значений;
+- `RevitParameterKeyFactory` — Revit `Parameter` ↔ Domain `ParameterKey`;
+- `RevitParameterValueConverter` — значение Revit → значение Domain;
+- `RevitSyntheticParameterProvider` — Category, Family, Level, Workset и другие вычисляемые свойства;
+- `RevitTypeParameterCache` — повторное использование чтения параметров типа.
 
 ```text
 Revit Element / Parameter
-↓
-Revit parameter adapter
-↓
-ParameterKey + Domain value
-↓
-Application filtering
+→ адаптер параметров Revit
+→ ParameterKey + значение Domain
+→ фильтрация Application
 ```
 
-`ParameterKey` принадлежит Domain. Revit layer отвечает за то, чтобы корректно создать/разрешить этот key относительно конкретного Revit source.
-
-## Документы
+`ParameterKey` принадлежит Domain. Слой Revit отвечает за его корректное создание и обратное разрешение относительно конкретной модели.
 
 - [`snapshot-building.md`](snapshot-building.md)
 - [`parameter-translation.md`](parameter-translation.md)
 
-## Инвариант
-
-> Удобное display name не может заменять стабильную identity параметра при переходе через Revit boundary.
+> Удобная отображаемая подпись не может заменять стабильную идентичность параметра при переходе через границу Revit.

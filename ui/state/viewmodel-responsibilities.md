@@ -1,68 +1,30 @@
-# ViewModel responsibilities
+# Ответственности ViewModel
 
-UI использует MVVM. `MainPaneViewModel` является главным UI-оркестратором, но orchestration здесь означает координацию presentation state и вызовов Application, а не владение системной логикой.
+UI использует MVVM. `MainPaneViewModel` является главным координатором экрана, но эта координация относится к состоянию представления и вызовам Application, а не к владению системной логикой.
 
 ## MainPaneViewModel
 
-Координирует пользовательский экран:
+Связывает сбор, фильтрацию, действия, пресеты и историю, координирует специализированные ViewModel и асинхронные операции, обновляет прогресс и ошибки.
+
+## Специализированные ViewModel
+
+- `ContextTreeViewModel` / `ContextTreeNodeViewModel` — представление Категория → Семейство → Тип, отметки, поиск;
+- `ParametersViewModel` — индекс параметров, группировка и выбор параметра/значения;
+- `QuickFilterViewModel` — взаимодействие быстрого фильтра и отложенный запуск вычисления;
+- `ActiveFilterConditionsViewModel` — отображение активных условий;
+- `PresetItemViewModel` — элемент списка пресетов;
+- `ScopeOptionViewModel` — вариант области и `BlockedReason`;
+- `ParameterGroupNodeViewModel` — группы параметров.
+
+Задержка UI-событий не меняет каноническую компиляцию быстрого фильтра, которая принадлежит Application.
+
+## Инфраструктура MVVM
+
+Реализация содержит `ViewModelBase` / `INotifyPropertyChanged`, `RelayCommand`, `AsyncRelayCommand`, converters, `UiDispatcher`, `WpfApplicationBootstrap`, `MainPaneViewHost`.
 
 ```text
-collect
-filter
-actions
-presets
-history
+ViewModel координирует представление
+!= ViewModel владеет системной семантикой
 ```
 
-Он связывает specialized ViewModels и async operations, обновляет busy/progress/error state и синхронизирует видимые части экрана.
-
-## Specialized ViewModels
-
-### ContextTreeViewModel / ContextTreeNodeViewModel
-
-Отвечают за представление `Category → Family → Type`, checked state, search/selection controls.
-
-### ParametersViewModel
-
-Отвечает за отображение parameter index, группировку и текущий parameter/value selection.
-
-### QuickFilterViewModel
-
-Отвечает за пользовательский quick-filter interaction и debounced initiation evaluation.
-
-Debounce здесь является поведением взаимодействия, но каноническая компиляция quick filter принадлежит Application.
-
-### ActiveFilterConditionsViewModel
-
-Показывает активные условия пользователю. Он не является владельцем `FilterDefinition`.
-
-### PresetItemViewModel
-
-Представляет preset в списке. Persistence и `PresetDefinition` принадлежат другим слоям.
-
-### ScopeOptionViewModel
-
-Представляет scope option и `BlockedReason`, позволяя UI объяснить недоступность конкретного варианта.
-
-### ParameterGroupNodeViewModel
-
-Организует parameter presentation groups.
-
-## MVVM infrastructure
-
-Реализация содержит:
-
-- `ViewModelBase` / `INotifyPropertyChanged`;
-- `RelayCommand`, `AsyncRelayCommand`;
-- converters;
-- `UiDispatcher` для UI-thread marshaling;
-- `WpfApplicationBootstrap` и `MainPaneViewHost`.
-
-## Инвариант
-
-```text
-ViewModel coordinates presentation
-!= ViewModel owns system semantics
-```
-
-Если правило должно оставаться истинным вне WPF, его canonical owner находится не в UI.
+Если правило должно оставаться истинным вне WPF, его канонический владелец находится не в UI.

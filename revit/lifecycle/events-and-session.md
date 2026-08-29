@@ -1,53 +1,26 @@
-# Events and user session
+# События Revit и пользовательская сессия
 
-`ContextCoordinationService` связывает Revit host events с текущим состоянием ContextFilter.
+`ContextCoordinationService` связывает события Revit с текущим состоянием ContextFilter.
 
-## Подтверждённые responsibilities
-
-- debounced `DocumentChanged`;
-- incremental patch vs full invalidate;
-- opt-in auto-refresh при смене view;
-- progress chunked collection;
-- session lifecycle gating;
-- selection-change handling для `CurrentSelection`.
-
-## DocumentChanged
+Подтверждены обработка `DocumentChanged` с задержкой, локальное обновление или полная инвалидация, автоматическое обновление при смене вида по желанию пользователя, прогресс порционного сбора, ограничение активной сессией и наблюдение изменения выделения для `CurrentSelection`.
 
 ```text
 DocumentChanged
-↓
-debounce
-↓
-known bounded change?
-├─ yes → attempt incremental patch
-└─ no  → mark stale / invalidate
+→ задержка частых событий
+→ изменение локальное и известное?
+├─ да → попытаться обновить локально
+└─ нет → пометить устаревшим / инвалидировать
 ```
 
-Точные thresholds принадлежат runtime configuration и не являются смыслом Revit event.
+Точные пороги принадлежат конфигурации выполнения.
 
-## Idling
+При `IsUserSessionActive == false` подтверждены отсутствие сбора, индексации и подсветки на `Idling`.
 
-При `IsUserSessionActive == false` implementation analysis подтверждает:
-
-- no collect;
-- no index work;
-- no highlight work.
-
-При активной session `Idling` может:
-
-- pump chunked collection;
-- заметить selection change;
-- инициировать opt-in auto-refresh.
-
-## Document transition
-
-Document close/switch должен приводить к прекращению obsolete document-bound work и обновлению downstream UI/context state.
-
-## Инвариант
+При активной сессии `Idling` может продвигать порционный сбор, отслеживать выделение и инициировать включённое пользователем автообновление.
 
 ```text
-host event received
-!= always perform expensive work
+получено событие Revit
+!= всегда выполнять дорогую операцию
 ```
 
-Event является evidence об изменении host state. Конкретная реакция зависит от active session, scope и freshness policy.
+Событие — подтверждение изменения среды; реакция зависит от активной сессии, области и актуальности данных.

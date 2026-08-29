@@ -1,30 +1,24 @@
-# UI Interaction
+# Пользовательское взаимодействие
 
-Этот раздел описывает пользовательское взаимодействие с ContextFilter: как пользователь открывает инструмент, выбирает контекст, формирует filter intent, запускает действия и получает feedback.
-
-## Канонический flow
+Этот раздел описывает, как пользователь открывает ContextFilter, выбирает рабочий контекст, формирует условия фильтра, запускает действия и получает сообщения о результате.
 
 ```text
-Open ContextFilter
-→ choose scope
-→ inspect Category / Family / Type
-→ choose parameter
-→ choose values / conditions
-→ evaluate
-→ inspect matched count
-→ apply selection / visibility / native filter action
+Открыть ContextFilter
+→ выбрать область
+→ просмотреть Категорию / Семейство / Тип
+→ выбрать параметр
+→ выбрать значения / условия
+→ вычислить результат
+→ увидеть количество совпадений
+→ применить действие выделения / видимости / штатного фильтра
 ```
 
-UI инициирует этот flow, но не владеет семантикой его шагов.
-
-## Документы
+UI инициирует этот сценарий, но не владеет семантикой его шагов.
 
 - [`screen-model.md`](screen-model.md) — структура основной рабочей области;
 - [`user-actions.md`](user-actions.md) — пользовательские действия и их границы;
 - [`presentation-modes.md`](presentation-modes.md) — DockablePane и FloatingWindow;
-- [`feedback-and-guardrails.md`](feedback-and-guardrails.md) — предупреждения, blocked state и ошибки;
-- [`host-interaction.md`](host-interaction.md) — взаимодействие с native Revit semantics и hotkeys.
+- [`feedback-and-guardrails.md`](feedback-and-guardrails.md) — предупреждения, недоступные состояния и ошибки;
+- [`host-interaction.md`](host-interaction.md) — взаимодействие со штатным управлением Revit и горячими клавишами.
 
-## Инвариант
-
-> Plugin interaction должен дополнять host application, а не незаметно перехватывать его устоявшуюся семантику.
+> Дополнительные способы взаимодействия с плагином должны дополнять Revit, а не незаметно перехватывать его устоявшуюся семантику.

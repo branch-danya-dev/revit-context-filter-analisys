@@ -1,61 +1,34 @@
 # Infrastructure
 
-`Infrastructure` содержит адаптеры для локального хранения, конфигурации и файлового логирования.
+`Infrastructure` содержит адаптеры локального хранения, конфигурации и файлового журналирования.
 
 Он реализует порты, объявленные в `application/`, но не владеет смыслом фильтров, пресетов или пользовательских сценариев.
 
-## Ответственность
-
 ```text
-Application ports
+Порты Application
       ↓
-Infrastructure adapters
+Адаптеры Infrastructure
       ↓
 %AppData%\ContextFilter
 ```
 
-Infrastructure отвечает за:
+Infrastructure отвечает за JSON-хранение, расположение локальных данных, миграцию сохранённых схем, проверку/нормализацию конфигурации, атомарную замену файлов, ограничение истории, файловое журналирование и регистрацию собственных адаптеров.
 
-- JSON persistence;
-- физическое расположение локальных данных;
-- migration persisted schemas;
-- validation / sanitization загруженной конфигурации;
-- atomic file replacement для критичных записей;
-- deduplication и ограничение истории;
-- файловое логирование;
-- регистрацию собственных adapter implementations в DI.
-
-Infrastructure **не** отвечает за:
-
-- Domain semantics;
-- orchestration use cases;
-- Revit API access;
-- WPF state;
-- выбор runtime evaluation strategy.
+Он не отвечает за семантику Domain, сценарии Application, Revit API, состояние WPF или выбор способа вычисления фильтра.
 
 ## Структура
 
 ```text
 infrastructure/
-├─ persistence/     → JSON stores, layout, atomic writes, schema migration
-├─ configuration/   → settings lifecycle, sanitization, calm defaults
-├─ logging/         → file logging boundary
-└─ diagrams/        → infrastructure data flow
+├─ persistence/     → JSON-хранилища, размещение, атомарная запись, миграции
+├─ configuration/   → жизненный цикл настроек, нормализация, безопасные значения по умолчанию
+├─ logging/         → граница файлового журналирования
+└─ diagrams/        → движение данных Infrastructure
 ```
-
-## Главная граница доверия
 
 ```text
-file exists
-!= file is valid runtime state
+файл существует
+!= файл является корректным рабочим состоянием
 ```
 
-Persisted data является внешним входом для приложения. После чтения оно должно пройти применимые migration и validation/sanitization шаги прежде, чем станет доверенным runtime state.
-
-## Связи
-
-- [`../application/ports/`](../application/ports/) — контракты, которые реализует Infrastructure;
-- [`../domain/presets/`](../domain/presets/) — semantic model пресета;
-- [`persistence/`](persistence/) — stores и durable data;
-- [`configuration/`](configuration/) — настройки и граница доверия;
-- [`logging/`](logging/) — локальная диагностика.
+Сохранённые данные являются входом системы и перед использованием должны пройти применимые миграции и проверки.

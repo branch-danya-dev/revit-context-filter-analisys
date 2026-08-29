@@ -1,6 +1,4 @@
-# Storage layout
-
-ContextFilter хранит собственные локальные данные в пользовательском профиле:
+# Размещение локальных данных
 
 ```text
 %AppData%\ContextFilter\
@@ -10,39 +8,17 @@ ContextFilter хранит собственные локальные данны�
 └─ logs\
 ```
 
-## Назначение файлов
-
-### `settings.json`
-
-Хранит пользовательские и runtime-настройки плагина, включая настройки поведения UI и производительности.
-
-### `presets.json`
-
-Хранит пользовательские и встроенные пресеты. Semantic model пресета определена в `domain/presets/`; Infrastructure отвечает только за durable representation и migration.
-
-### `recent.json`
-
-Хранит историю фильтров. Infrastructure применяет deduplication по signature и ограничение количества элементов через `HistoryMaxItems`.
-
-### `logs/`
-
-Каталог файловых логов `FileAppLogger`.
-
-## Ownership
+- `settings.json` — пользовательские и рабочие настройки;
+- `presets.json` — пользовательские и встроенные пресеты;
+- `recent.json` — история фильтров;
+- `logs/` — журналы `FileAppLogger`.
 
 ```text
-Domain object / Application state
-        ↓
-Infrastructure serialization
-        ↓
-local file
+объект Domain / состояние Application
+→ сериализация Infrastructure
+→ локальный файл
 ```
 
-Файл не становится владельцем смысла объекта только потому, что является durable copy.
+Файл не становится владельцем смысла объекта только потому, что является долговременной копией.
 
-## Инварианты
-
-- удаление cache-like runtime data не должно менять Domain meaning;
-- corrupt/old file не должен напрямую становиться runtime state;
-- путь хранения является Infrastructure concern, а не частью Domain contract;
-- Revit document не хранится и не реплицируется в этих файлах.
+Повреждённый или старый файл не должен напрямую становиться рабочим состоянием; путь хранения — ответственность Infrastructure; Revit-документ в этих файлах не хранится и не реплицируется.

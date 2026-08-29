@@ -1,49 +1,28 @@
-# Main-thread contract
+# Контракт главного потока Revit
 
-Autodesk Revit API доступен ContextFilter только в разрешённом Revit execution context.
-
-## Контракт
+Autodesk Revit API доступен ContextFilter только в разрешённом контексте выполнения Revit.
 
 ```text
-caller thread
-↓
-Application port
-↓
-Revit request
-↓
-ExternalEvent
-↓
-Revit main thread
-↓
-Revit API
+поток вызывающего кода
+→ порт Application
+→ запрос Revit
+→ ExternalEvent
+→ главный поток Revit
+→ Revit API
 ```
 
-UI может быть asynchronous, но Revit API operation остаётся host-controlled synchronous execution.
+UI может быть асинхронным, но операция Revit API остаётся синхронным выполнением, контролируемым средой.
 
-## Следствия
+Следствия:
 
 1. ViewModel не вызывает Revit API напрямую.
-2. Application use case не хранит `Document`, `View` или `UIDocument` как свой runtime authority.
-3. Revit-specific read/write operation выполняется после dispatch в ExternalEvent handler.
-4. Response возвращается обратно через async boundary.
-
-## Что это защищает
-
-Такой контракт предотвращает смешивание двух разных concurrency models:
+2. Application не хранит `Document`, `View`, `UIDocument` как собственный источник истины.
+3. Чтение/запись Revit выполняется после диспетчеризации в обработчике `ExternalEvent`.
+4. Ответ возвращается обратно через асинхронную границу.
 
 ```text
-WPF / Task-based async model
-!=
-Revit API execution model
+асинхронная модель WPF / Task
+!= модель выполнения Revit API
 ```
 
-## Failure boundary
-
-Если request невозможно выполнить в текущем host context, это не должно интерпретироваться как корректный пустой результат Domain/Application workflow.
-
-```text
-host execution failure
-!= zero matches
-```
-
-Конкретная причина должна вернуться вызывающему слою как failure/response, после чего UI может показать её пользователю.
+Если запрос невозможно выполнить в текущем контексте Revit, это не должно интерпретироваться как корректный пустой результат фильтрации.

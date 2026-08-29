@@ -1,44 +1,27 @@
-# Diagnostic boundary
+# Граница диагностики
 
-ContextFilter имеет несколько видов диагностических механизмов, но Infrastructure владеет только durable logging adapter.
-
-## Разделение
+ContextFilter имеет несколько диагностических механизмов, но Infrastructure владеет только файловым адаптером хранения журналов.
 
 ```text
-runtime metric / error context
-→ diagnostic producer
+метрика / контекст ошибки
+→ источник диагностического события
 → IAppLogger
 → FileAppLogger
-→ file
+→ файл
 ```
 
 ### Infrastructure
+`FileAppLogger`, расположение файлов и механизм записи.
 
-- `FileAppLogger`;
-- log file location;
-- durable log write mechanics.
-
-### Application / runtime
-
-- performance meaning;
-- operation duration / element-count measurements;
-- decisions о том, какие события стоит измерять.
+### Application
+Смысл показателей производительности, длительность операций, количество элементов и решение о том, что измерять.
 
 ### Revit
-
-- host crash trace;
-- Revit lifecycle context;
-- host-specific exception boundaries.
-
-## Почему это важно
-
-Наличие общей папки `logs/` не делает Infrastructure владельцем всех failure semantics.
+Следы аварий среды, жизненный цикл Revit и специфичные для среды границы исключений.
 
 ```text
-where evidence is stored
-!= who owns meaning of evidence
+где хранится подтверждение
+!= кто владеет смыслом события
 ```
 
-## Граница evidence
-
-Source analysis подтверждает `FileAppLogger`, `PerformanceLogger` и `CrashTrace`, но не задаёт публичный logging schema или retention policy. Поэтому они здесь не придумываются.
+Источник подтверждает `FileAppLogger`, `PerformanceLogger`, `CrashTrace`, но не задаёт публичную схему логов или политику хранения — они не придумываются.

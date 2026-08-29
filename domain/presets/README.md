@@ -1,15 +1,15 @@
-# Domain · Presets
+# Domain · Пресеты
 
-Preset — это **сохраняемый reusable filter intent**, а не сохранённый результат фильтрации и не JSON-файл.
+Пресет — это **сохраняемые условия фильтра для повторного использования**, а не сохранённый результат и не JSON-файл.
 
-Основная модель описана в [`preset-model.md`](preset-model.md).
+Основная модель: [`preset-model.md`](preset-model.md).
 
 ```text
 PresetDefinition
-→ reusable intent
+→ повторно используемые условия
 
 JsonPresetStore
-→ persistence representation
+→ физическое представление хранения
 ```
 
-Persistence lifecycle и schema migration реализуются в `infrastructure/`, но semantic distinction `Full | Template` принадлежит Domain.
+Жизненный цикл хранения и миграции схем реализуется в `infrastructure/`, но смысл различия `Full | Template` принадлежит Domain.

@@ -3,39 +3,40 @@ skinparam monochrome true
 skinparam shadowing false
 skinparam defaultTextAlignment center
 
-actor User
+actor "Пользователь" as User
 rectangle "ContextFilter.UI" {
   rectangle "MainPaneView /\nMainFilterWindow" as View
   rectangle "MainPaneViewModel" as MainVM
-  rectangle "Specialized ViewModels" as VMs
-  rectangle "UI state / feedback" as State
+  rectangle "Специализированные ViewModel" as VMs
+  rectangle "Состояние UI / сообщения" as State
 }
 rectangle "ContextFilter.Application" {
-  rectangle "Use cases / services" as App
-  interface "IRevitGateway / ports" as Ports
+  rectangle "Сценарии / сервисы" as App
+  interface "IRevitGateway / порты" as Ports
 }
-rectangle "ContextFilter.Revit /\nInfrastructure adapters" as Adapters
+rectangle "Адаптеры ContextFilter.Revit /\nInfrastructure" as Adapters
 
-User --> View : interact
-View --> MainVM : command / binding
-MainVM --> VMs : coordinate presentation
-VMs --> MainVM : selected UI state
-MainVM --> App : invoke workflow
-App --> Ports : external capability
-Ports --> Adapters : adapter call
-Adapters --> Ports : response / failure
+User --> View : взаимодействие
+View --> MainVM : команда / binding
+MainVM --> VMs : координация представления
+VMs --> MainVM : выбранное состояние UI
+MainVM --> App : запустить сценарий
+App --> Ports : внешняя возможность
+Ports --> Adapters : вызов адаптера
+Adapters --> Ports : ответ / ошибка
 Ports --> App
-App --> MainVM : result
-MainVM --> State : update
-State --> View : render
+App --> MainVM : результат
+MainVM --> State : обновить
+State --> View : отобразить
 
 note right of View
-Initial binding is not user intent.
-Side effects are suppressed during bind.
+Первичное связывание данных
+не является намерением пользователя.
+Побочные действия в этот момент подавлены.
 end note
 
 note bottom of State
-Document-bound derived UI state
-must be reset on document transition.
+Производное состояние конкретного документа
+сбрасывается при смене документа.
 end note
 @enduml

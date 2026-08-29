@@ -1,47 +1,26 @@
-# Filter Result
+# FilterResult
 
-`IFilterEvaluator` в Domain contract возвращает `FilterResult`:
+`IFilterEvaluator` возвращает `FilterResult`:
 
 ```text
 Evaluate(elements, definition, cancellation)
 → FilterResult
 ```
 
-## Семантическая роль
-
-`FilterResult` представляет результат применения `FilterDefinition` к конкретному candidate set.
+`FilterResult` представляет результат применения `FilterDefinition` к конкретному множеству кандидатов и является производным состоянием.
 
 ```text
-Candidate Set
-+
-FilterDefinition
-↓
-FilterResult
+Множество кандидатов
++ FilterDefinition
+→ FilterResult
 ```
 
-Он является **derived state** и зависит как минимум от:
-
-- текущего candidate set;
-- filter definition;
-- доступных parameter values.
-
-## Что источник не подтверждает
-
-Предоставленный `PROJECT_ANALYSIS.md` не содержит определения полей `FilterResult`.
-
-Поэтому этот документ намеренно **не придумывает**:
-
-- точные свойства объекта;
-- порядок элементов;
-- наличие статистики/diagnostics;
-- структуру ошибок внутри результата.
-
-Эти детали должны быть добавлены только после проверки исходного Domain type или дополнительных evidence.
+Переданный `PROJECT_ANALYSIS.md` не содержит определения полей `FilterResult`, поэтому документ намеренно не придумывает точные свойства, порядок элементов, статистику или структуру ошибок.
 
 ## Инварианты
 
-1. Filter result не является source authority для Revit elements.
-2. Zero matches является валидным результатом только при успешной evaluation.
-3. Evaluation failure не должен молча выглядеть как valid empty result.
-4. Результат относится к конкретному context/filter state и может устареть после изменения source model.
-5. Действие над результатом не меняет семантику самого `FilterResult`.
+1. Результат не является источником истины для Revit-элементов.
+2. Ноль совпадений — корректный результат только при успешном вычислении.
+3. Ошибка вычисления не должна выглядеть как корректный пустой результат.
+4. Результат относится к конкретному контексту и фильтру и может устареть после изменения модели.
+5. Действие над результатом не меняет его семантику.
