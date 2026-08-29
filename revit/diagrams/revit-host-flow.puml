@@ -11,41 +11,41 @@ rectangle "ContextFilter.Revit" {
   rectangle "ExternalEvent" as EE
   rectangle "ContextFilterExternalEventHandler" as Handler
   rectangle "RevitRequestDispatcher" as Dispatcher
-  rectangle "Collection / Parameter / Action services" as Services
+  rectangle "Сервисы сбора / параметров / действий" as Services
   rectangle "ContextCoordinationService" as Coord
 }
 rectangle "Autodesk Revit" {
   rectangle "Document / View / UIDocument" as Revit
-  rectangle "Host events\nViewActivated / Idling / Document*" as Events
+  rectangle "События Revit\nViewActivated / Idling / Document*" as Events
 }
 
-Caller --> Port : async request
+Caller --> Port : асинхронный запрос
 Port --> GW
-GW --> Queue : enqueue
+GW --> Queue : поставить в очередь
 Queue --> EE : Raise()
-EE --> Handler : execute on Revit thread
+EE --> Handler : выполнить в потоке Revit
 Handler --> Dispatcher
 Dispatcher --> Services
-Services --> Revit : read / mutate
-Revit --> Services : result / failure
+Services --> Revit : чтение / изменение
+Revit --> Services : результат / ошибка
 Services --> Dispatcher
 Dispatcher --> Handler
-Handler --> GW : complete response
+Handler --> GW : завершить ответ
 GW --> Port
 Port --> Caller
 
-Events --> Coord : host evidence
-Coord --> Queue : refresh / rebuild when needed
-Coord --> Caller : state/progress coordination
+Events --> Coord : сведения среды
+Coord --> Queue : обновить / перестроить при необходимости
+Coord --> Caller : состояние / прогресс
 
 note right of EE
-Revit API access is host-controlled.
-Async caller does not imply
-thread-safe API access.
+Доступ к Revit API контролирует среда.
+Асинхронный вызывающий код не означает
+потокобезопасный доступ к API.
 end note
 
 note bottom of Services
-Domain meaning is not redefined here.
-This layer realizes it under Revit constraints.
+Смысл Domain здесь не переопределяется.
+Слой реализует его с учётом ограничений Revit.
 end note
 @enduml

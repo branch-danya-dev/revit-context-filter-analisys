@@ -1,54 +1,34 @@
-# Request pipeline
+# Цепочка запроса Revit
 
-Revit request pipeline реализует `IRevitGateway` через host-specific dispatcher.
-
-## Поток
+`IRevitGateway` реализуется через диспетчер `ExternalEvent`.
 
 ```text
-IRevitGateway method
-↓
-RevitExternalEventDispatcher
-↓
-RevitRequest
-↓
-RevitRequestQueue
-↓
-ExternalEvent.Raise()
-↓
-ContextFilterExternalEventHandler.Execute()
-↓
-RevitRequestDispatcher.Execute(request)
-↓
-specialized Revit service
-↓
-response
+метод IRevitGateway
+→ RevitExternalEventDispatcher
+→ RevitRequest
+→ RevitRequestQueue
+→ ExternalEvent.Raise()
+→ ContextFilterExternalEventHandler.Execute()
+→ RevitRequestDispatcher.Execute(request)
+→ специализированный сервис Revit
+→ ответ
 ```
 
-## Request vocabulary
-
-Подтверждённые операции охватывают весь host boundary:
-
-| Request | Host responsibility |
+| Запрос | Ответственность Revit |
 |---|---|
-| `Ping` | проверить доступность Revit context |
-| `RefreshContext` | прочитать текущий candidate context |
-| `BuildParameterIndex` | получить host parameter data |
+| `Ping` | проверить доступность контекста |
+| `RefreshContext` | прочитать текущих кандидатов |
+| `BuildParameterIndex` | получить данные параметров |
 | `BuildParameterValues` | получить значения параметра |
-| `ApplySelection` | изменить Revit selection |
-| `ApplyVisibility` | изменить temporary visibility |
-| `ApplyNativeFilter` | создать/применить native filter |
+| `ApplySelection` | изменить выделение Revit |
+| `ApplyVisibility` | изменить временную видимость |
+| `ApplyNativeFilter` | создать/применить штатный фильтр |
 
-## Что request не делает
-
-Request type не является Domain command language. Например:
+Тип запроса не является языком команд Domain.
 
 ```text
 FilterDefinition
 != ApplyNativeFilter request
 ```
 
-Первый объект описывает смысл фильтра, второй — конкретную попытку реализовать часть этого смысла через Revit capability.
-
-## Response boundary
-
-Host-side service возвращает response обратно в async caller. Для action flow implementation analysis подтверждает ответ с count/message, который затем превращается UI в `ActionFeedbackMessage`.
+Сервис Revit возвращает ответ асинхронному вызывающему коду. Для действий подтверждён ответ с количеством/сообщением, который затем отображается UI.

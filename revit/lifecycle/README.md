@@ -1,35 +1,17 @@
-# Lifecycle
+# Жизненный цикл
 
-`lifecycle/` описывает связь ContextFilter с жизненным циклом Autodesk Revit и текущего document/session context.
+`lifecycle/` описывает связь ContextFilter с жизненным циклом Autodesk Revit и текущего документа/пользовательской сессии.
 
-## Host lifecycle responsibilities
-
-Revit layer отвечает за:
-
-- `OnStartup` / `OnShutdown` add-in;
-- регистрацию ribbon и dockable pane;
-- подписку на `ViewActivated`, `Idling`, `DocumentOpened`, `DocumentClosed`, `DocumentChanged`;
-- session-bound background work;
-- document/view/selection transitions;
-- hotkey hooks, активные только в допустимом host context;
-- освобождение ресурсов без зависания Revit.
-
-## Документы
+Слой Revit отвечает за `OnStartup` / `OnShutdown`, регистрацию Ribbon и DockablePane, события `ViewActivated`, `Idling`, `DocumentOpened`, `DocumentClosed`, `DocumentChanged`, ограничение фоновой работы активной сессией, переходы документа/вида/выделения, горячие клавиши и безопасное завершение.
 
 - [`startup-shutdown.md`](startup-shutdown.md)
 - [`events-and-session.md`](events-and-session.md)
 - [`hotkeys.md`](hotkeys.md)
 
-## Основной принцип
-
 ```text
-plugin process lifetime
-!= current document lifetime
-!= active user session lifetime
+время жизни процесса Revit
+!= время жизни текущего документа
+!= время жизни активной пользовательской сессии
 ```
 
-Эти три времени жизни пересекаются, но не являются одним и тем же.
-
-## Validation evidence
-
-Пользовательское тестирование выявило, что background operations могли продолжаться после закрытия документа, UI state мог переживать document switch, а постоянные event handlers создавали лишнюю нагрузку. После стабилизации работа была привязана к активной пользовательской сессии и host lifecycle.
+Пользовательское тестирование выявило фоновую работу после закрытия документа, сохранение состояния UI при смене документа и лишнюю нагрузку постоянных обработчиков. После стабилизации активность была привязана к реальному жизненному циклу Revit и пользовательской сессии.

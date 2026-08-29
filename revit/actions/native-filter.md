@@ -1,52 +1,29 @@
-# Native filter action
+# Действие штатного фильтра Revit
 
-`NativeFilterActionService` пытается материализовать совместимый `FilterDefinition` как штатный Revit `ParameterFilterElement` и привязать его к view.
-
-## Pipeline
+`NativeFilterActionService` пытается материализовать совместимый `FilterDefinition` как штатный `ParameterFilterElement` и привязать его к виду.
 
 ```text
 FilterDefinition
-↓
-Application NativeFilterCompatibilityAnalyzer
-↓
-compatible semantic subset
-↓
-IRevitGateway.ApplyNativeFilterAsync
-↓
-FilterDefinitionToElementFilterConverter
-↓
-RevitParameterResolver
-↓
-ElementFilter / ParameterFilterElement
-↓
-attach to View
+→ NativeFilterCompatibilityAnalyzer
+→ совместимая часть семантики
+→ IRevitGateway.ApplyNativeFilterAsync
+→ FilterDefinitionToElementFilterConverter
+→ RevitParameterResolver
+→ ElementFilter / ParameterFilterElement
+→ привязка к View
 ```
 
-## Подтверждённый compatibility subset
+Подтверждённая совместимость включает `Equals`, `NotEquals`, `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`, `InList`.
 
-Application analysis допускает native conversion для:
-
-- Equals;
-- NotEquals;
-- GreaterThan / GreaterThanOrEqual;
-- LessThan / LessThanOrEqual;
-- InList.
-
-Не все Domain capabilities имеют native representation: negate, richer string operators, Between, большинство synthetic parameters и top-level OR могут быть несовместимы.
-
-## Важная граница
+`Negate`, более богатые строковые операторы, `Between`, большинство вычисляемых параметров и верхнеуровневый OR могут не иметь штатного представления.
 
 ```text
-semantic filter
+фильтр ContextFilter
 != Revit ElementFilter
 ```
 
-Native filter является optional realization, а не канонической формой фильтра ContextFilter.
+Штатный фильтр — дополнительная реализация, а не каноническая форма `FilterDefinition`.
 
-## Parameter resolution
+Даже совместимый оператор требует успешного разрешения `ParameterKey` в параметр Revit. Совместимость оператора и разрешимость параметра — разные проверки.
 
-Даже совместимый оператор требует успешного разрешения Domain `ParameterKey` в Revit-compatible parameter identity. Поэтому operator compatibility и parameter resolvability — связанные, но разные проверки.
-
-## Conflict handling
-
-Domain содержит `NativeFilterAction / NativeFilterConflictResolution`, однако переданный source analysis не раскрывает полный conflict-resolution contract. Этот документ не придумывает точные сценарии replace/rename beyond подтверждённого факта создания/замены native filters.
+Domain содержит `NativeFilterAction` / `NativeFilterConflictResolution`, но переданный анализ не раскрывает полный контракт разрешения конфликтов. Точные сценарии переименования/замены сверх подтверждённых фактов не придумываются.

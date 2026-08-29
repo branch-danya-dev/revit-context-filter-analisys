@@ -1,50 +1,21 @@
-# Revit context state
+# Состояние контекста Revit
 
-`RevitContextState` отслеживает host identity, от которой зависит актуальность собранного context.
+`RevitContextState` отслеживает идентичность среды, от которой зависит актуальность собранного контекста.
 
-Подтверждённые dimensions:
+Подтверждены текущий документ, активный вид и хэш текущего выделения.
 
-- current document identity;
-- active view tracking;
-- current selection hash.
-
-## Почему это Revit responsibility
-
-Application может хранить derived cache key, но только Revit adapter может наблюдать фактический host state, который делает этот key актуальным или устаревшим.
+Application может хранить производный ключ кэша, но только адаптер Revit наблюдает фактическое состояние среды, делающее этот ключ актуальным или устаревшим.
 
 ```text
 Revit Document / View / Selection
-↓
-RevitContextState
-↓
-change evidence
-↓
-Application cache / UI refresh decisions
+→ RevitContextState
+→ подтверждение изменения
+→ решения о кэше / обновлении UI
 ```
 
-## Host transitions
-
-### View change
-
-Имеет значение прежде всего для `ActiveView` scope.
-
-### Selection change
-
-Имеет значение для `CurrentSelection` scope.
-
-### Model change
-
-`DocumentChanged` может потребовать incremental patch либо invalidation/recollect.
-
-### Document switch/close
-
-Старый document-bound context больше не должен считаться допустимым источником для новой пользовательской сессии.
-
-## Инвариант
+Смена вида важна для `ActiveView`, смена выделения — для `CurrentSelection`, `DocumentChanged` может потребовать локального обновления или пересборки, а закрытие/смена документа делает старый контекст недействительным.
 
 ```text
-same in-memory object
-!= same valid Revit context
+тот же объект в памяти
+!= тот же корректный контекст Revit
 ```
-
-Валидность определяется совместимостью derived state с текущим host identity, а не тем, что объект всё ещё находится в памяти.

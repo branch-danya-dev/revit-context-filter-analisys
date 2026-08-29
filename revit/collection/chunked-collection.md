@@ -1,58 +1,34 @@
-# Chunked collection
+# Порционный сбор
 
-Большие Revit contexts нельзя безусловно читать одним долгим blocking operation, если это ухудшает responsiveness host application.
+Большие контексты Revit не следует безусловно читать одной длительной блокирующей операцией, если это ухудшает отзывчивость интерфейса Revit.
 
-## Подтверждённая реализация
+При количестве элементов выше `ChunkedCollectionThreshold` используется `ChunkedCollectionSession`.
 
-При количестве элементов выше `ChunkedCollectionThreshold` collection переключается на `ChunkedCollectionSession`.
-
-Текущие implementation settings:
+Текущие настройки реализации:
 
 ```text
-threshold: 2500 elements
-chunk size: 800 elements
-Idling time budget: 45 ms
+порог: 2500 элементов
+размер порции: 800 элементов
+бюджет Idling: 45 мс
 ```
 
-Эти числа являются runtime/configuration details, а не Domain semantics.
-
-## Поток
+Эти числа — детали выполнения, а не семантика Domain.
 
 ```text
-large candidate set
-↓
-start ChunkedCollectionSession
-↓
-Idling tick
-↓
-process bounded chunk
-↓
-report progress
-↓
-next Idling tick
-↓
-complete collection
+большой набор кандидатов
+→ начать ChunkedCollectionSession
+→ событие Idling
+→ обработать ограниченную порцию
+→ сообщить прогресс
+→ следующее Idling
+→ завершить сбор
 ```
 
-## Ownership
+Revit владеет `Idling` и безопасным выполнением порции; Application использует полученные данные; UI показывает прогресс; Domain не знает о размере порции.
 
-- Revit layer владеет `Idling` и host-safe chunk execution;
-- Application владеет тем, как полученные данные используются далее;
-- UI только отображает progress;
-- Domain не знает о chunk size или `Idling`.
-
-## Session gate
-
-Chunked work не должно продолжаться как постоянный background activity, когда пользовательская сессия ContextFilter не активна.
-
-Implementation analysis подтверждает, что при `IsUserSessionActive == false` `Idling` не выполняет collect/index work.
-
-## Инвариант
+При `IsUserSessionActive == false` `Idling` не выполняет сбор/индексацию.
 
 ```text
-chunking
-changes execution timing
-
-chunking
-must not change collected semantic context
+порционный сбор меняет время выполнения
+!= меняет семантический результат сбора
 ```

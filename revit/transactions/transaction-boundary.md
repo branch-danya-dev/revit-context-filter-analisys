@@ -1,48 +1,31 @@
-# Transaction boundary
+# Граница транзакции
 
-Transaction boundary определяется не пользовательской кнопкой, а требованиями конкретного Revit API operation.
+Граница транзакции определяется требованиями конкретной операции Revit API, а не самой пользовательской кнопкой.
 
-## Не открывать transaction слишком рано
-
-Основной filter pipeline включает много read/compute steps:
+Основная цепочка фильтра содержит много шагов чтения и вычисления:
 
 ```text
-collect source data
-→ build snapshots/index
-→ evaluate FilterDefinition
-→ calculate target set
+собрать исходные данные
+→ построить снимки / индекс
+→ вычислить FilterDefinition
+→ рассчитать целевой набор
 ```
 
-Эти шаги не должны автоматически превращаться в одну длинную Revit write transaction.
-
-## Открывать transaction там, где начинается host mutation
+Эти шаги не должны автоматически превращаться в одну длинную транзакцию записи Revit.
 
 ```text
-prepared action intent
-↓
-Revit action service
-↓
-if operation requires transaction
-    start valid Revit transaction
-    perform mutation
-    commit / handle failure
+подготовлено намерение действия
+→ сервис действия Revit
+→ если операция требует транзакцию:
+   начать корректную транзакцию
+   выполнить изменение
+   commit / обработать ошибку
 ```
 
-## Почему граница важна
+Смешивание вычисления и изменения среды делает транзакцию длиннее реальной ответственности записи и затрудняет отделение ошибки Revit от корректного `FilterResult`.
 
-Смешивание вычисления и host mutation приводит к двум проблемам:
+В реальном тестировании изоляция была реализована вне необходимого транзакционного механизма и завершалась ошибкой; после исправления действие стало соблюдать контракт Revit.
 
-1. transaction живёт дольше фактической write responsibility;
-2. ошибку Revit mutation сложнее отделить от корректного filter result.
+Переданный анализ не содержит точной матрицы транзакций для каждого метода `SelectionActionService`, `VisibilityActionService`, `NativeFilterActionService`, поэтому здесь не утверждается, что все действия требуют одной стратегии.
 
-## Validation finding
-
-В реальном тестировании isolation была реализована вне необходимой transaction mechanics и завершалась ошибкой. После исправления action стал соблюдать Revit host contract.
-
-## Что source не подтверждает
-
-Переданный анализ не содержит точной transaction matrix для каждого метода `SelectionActionService`, `VisibilityActionService` и `NativeFilterActionService`. Поэтому здесь не утверждается, что все actions требуют одинаковой transaction strategy.
-
-Каноническое правило:
-
-> Каждый Revit adapter operation должен применять transaction ровно в соответствии с контрактом используемого Revit API.
+> Каждый адаптер Revit должен применять транзакцию ровно в соответствии с контрактом используемого Revit API.

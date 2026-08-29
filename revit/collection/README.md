@@ -1,36 +1,27 @@
-# Collection
+# Сбор данных
 
-`collection/` описывает чтение текущего Revit source state и преобразование его в данные, пригодные для Application/Domain.
+`collection/` описывает чтение текущего исходного состояния Revit и преобразование его в данные для Application/Domain.
 
-## Подтверждённые компоненты
+Подтверждены:
 
-- `RevitElementCollector` — `FilteredElementCollector` по выбранному scope;
+- `RevitElementCollector` — `FilteredElementCollector` по выбранной области;
 - `RevitElementTreeReader` — Category / Family / Type → `ElementTreeRecord`;
-- `SupportedElementRules` — исключение `View`, `ElementType` и internal categories;
+- `SupportedElementRules` — исключение `View`, `ElementType`, внутренних категорий;
 - `ChunkedCollectionSession` — порционный сбор на `Idling`;
-- `ContextCollectionService` — координация cache, patch и sync/chunked collection;
-- `RevitContextState` — document/view/selection tracking.
-
-## Граница
+- `ContextCollectionService` — координация кэша, локального обновления и обычного/порционного сбора;
+- `RevitContextState` — отслеживание документа, вида и выделения.
 
 ```text
 Revit Document / View / Selection
-↓
-collection adapter
-↓
-source records / snapshots
-↓
-Application projection
+→ адаптер сбора
+→ исходные записи / снимки
+→ проекции Application
 ```
 
-Revit layer отвечает за корректное чтение host state. Он не определяет смысл `CollectionScope` — этот enum принадлежит Domain.
-
-## Документы
+Слой Revit реализует физический сбор, но не определяет смысл `CollectionScope`.
 
 - [`scope-collection.md`](scope-collection.md)
 - [`chunked-collection.md`](chunked-collection.md)
 - [`context-state.md`](context-state.md)
 
-## Инвариант
-
-> Derived collection data должно оставаться связано с тем Revit document/view/selection state, из которого оно было получено.
+> Производные данные сбора должны оставаться связаны с тем состоянием Revit, из которого они получены.

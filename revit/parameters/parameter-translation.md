@@ -1,52 +1,26 @@
-# Parameter translation
+# Перевод параметров Revit ↔ Domain
 
-Revit boundary должен переводить между host-specific parameter representation и стабильной Domain identity.
-
-## Поток чтения
+Граница Revit переводит между представлением параметра в среде и стабильной идентичностью Domain.
 
 ```text
-Revit Parameter / synthetic source
-↓
-RevitParameterKeyFactory
-↓
-Domain ParameterKey
+Revit Parameter / вычисляемый источник
+→ RevitParameterKeyFactory
+→ Domain ParameterKey
 
-Revit raw value
-↓
-RevitParameterValueConverter
-↓
-Domain parameter value
+сырое значение Revit
+→ RevitParameterValueConverter
+→ значение Domain
 ```
 
-## Поток обратного разрешения
+Для создания штатного фильтра `ParameterKey` должен быть разрешён обратно в представление параметра Revit. Подтверждены `RevitParameterResolver` и `FilterDefinitionToElementFilterConverter`.
 
-Для native-filter realization Domain `ParameterKey` должен быть разрешён обратно в Revit-compatible parameter representation.
-
-Implementation analysis подтверждает `RevitParameterResolver` и `FilterDefinitionToElementFilterConverter` на action side.
-
-## Synthetic properties
-
-`RevitSyntheticParameterProvider` предоставляет такие filterable properties, как:
-
-- Category;
-- Family;
-- TypeName;
-- ElementId;
-- UniqueId;
-- Workset;
-- Level.
-
-Они могут участвовать в общем Domain filter language, хотя не каждый synthetic key соответствует native Revit `Parameter`.
-
-## Ключевое различие
+`RevitSyntheticParameterProvider` предоставляет `Category`, `Family`, `TypeName`, `ElementId`, `UniqueId`, `Workset`, `Level`.
 
 ```text
-Domain ParameterKey exists
-!= native Revit filter can represent it
+ParameterKey существует в Domain
+!= штатный фильтр Revit способен его представить
 ```
 
-Именно поэтому native-filter compatibility анализируется отдельно до host conversion.
+Именно поэтому совместимость анализируется отдельно до преобразования в штатный фильтр.
 
-## Display names
-
-Display label является presentation metadata. Разрешение параметра должно опираться на identity, а не на локализованную/неуникальную подпись.
+Отображаемое имя — метаданные представления. Разрешение параметра должно опираться на идентичность, а не на локализованную или неуникальную подпись.

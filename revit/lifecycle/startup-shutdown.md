@@ -1,42 +1,30 @@
-# Startup and shutdown
+# Запуск и завершение работы
 
-## Startup
+## Запуск
 
 `ContextFilterApplication.OnStartup()` подтверждённо выполняет:
 
-1. `AddinHost.Initialize()` — DI + ExternalEvent infrastructure;
-2. регистрацию dockable pane;
-3. создание Ribbon tab/button `ShowContextFilterCommand`;
-4. подписку на Revit events: `ViewActivated`, `Idling`, `DocumentOpened`, `DocumentClosed`, `DocumentChanged`.
+1. `AddinHost.Initialize()` — DI + `ExternalEvent`;
+2. регистрацию DockablePane;
+3. создание вкладки Ribbon и кнопки `ShowContextFilterCommand`;
+4. подписку на `ViewActivated`, `Idling`, `DocumentOpened`, `DocumentClosed`, `DocumentChanged`.
 
-## Launch policy
-
-После пользовательского тестирования plugin перестал автоматически открывать рабочую панель вместе с Revit. Пользователь запускает её через Ribbon.
-
-Это отделяет:
+После пользовательского тестирования плагин перестал автоматически открывать рабочую панель вместе с Revit. Пользователь запускает её через Ribbon.
 
 ```text
-add-in loaded
-!= user session active
+плагин загружен
+!= пользовательская сессия активна
 ```
 
-## Shutdown
+## Завершение
 
-Implementation analysis фиксирует специальный быстрый teardown без `ServiceProvider.Dispose()`, потому что полное dispose приводило к задержкам/зависанию Revit.
-
-Также stabilization history включает оптимизацию shutdown и освобождения ресурсов.
-
-## Почему это системное решение
-
-В обычном desktop app полное disposal может считаться стандартным выбором. В embedded add-in host behavior важнее универсальной привычки framework lifecycle.
+Анализ реализации фиксирует специальное быстрое завершение без `ServiceProvider.Dispose()`, потому что полное освобождение контейнера приводило к задержкам/зависанию Revit.
 
 ```text
-framework convention
-!= safe Revit shutdown behavior
+общая рекомендация фреймворка
+!= безопасное завершение внутри Revit
 ```
 
-## Инвариант
+> Завершение ContextFilter не должно удерживать или замедлять закрытие Autodesk Revit.
 
-> Teardown ContextFilter не должен удерживать или замедлять завершение Autodesk Revit.
-
-Переданный source analysis не даёт полного списка всех освобождаемых ресурсов, поэтому документ не расширяет shutdown algorithm сверх подтверждённых решений.
+Источник не даёт полный список освобождаемых ресурсов, поэтому алгоритм завершения не расширяется сверх подтверждённых решений.

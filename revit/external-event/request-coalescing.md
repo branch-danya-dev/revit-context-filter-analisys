@@ -1,52 +1,29 @@
-# Request coalescing
+# Схлопывание повторных запросов
 
-`RevitRequestQueue` не обязан выполнять каждый промежуточный request, если более новый request того же latest-only класса уже сделал старый неактуальным.
+`RevitRequestQueue` может не выполнять каждый промежуточный запрос, если более новый запрос того же класса «актуален только последний» уже сделал старый ненужным.
 
-## Подтверждённые coalescing cases
-
-Implementation analysis указывает схлопывание повторных:
+Подтверждено схлопывание повторных:
 
 - `RefreshContext`;
 - `BuildParameterIndex`;
-- live-highlight selection requests.
-
-Принцип:
+- запросов динамического выделения.
 
 ```text
-pending request A
-↓
-newer equivalent request B arrives
-↓
-A is no longer the desired current state
-↓
-keep latest relevant request
+ожидает запрос A
+→ приходит более новый эквивалентный запрос B
+→ A больше не отражает желаемое текущее состояние
+→ сохранить последний актуальный запрос
 ```
 
-## Зачем это нужно
+`ExternalEvent` — ограниченный ресурс среды; без такого механизма быстрые изменения UI создавали бы очередь уже устаревшей работы.
 
-ExternalEvent pipeline является ограниченным host resource. Без coalescing быстрые UI changes могут создать очередь действий, которые к моменту выполнения уже устарели.
-
-## Семантическая граница
-
-Coalescing допустим только для операций, где промежуточное состояние не является самостоятельным обязательным событием.
+Схлопывание допустимо только там, где промежуточное состояние не является обязательным самостоятельным событием.
 
 ```text
-latest-only refresh
-can be coalesced
-
-user-required durable mutation
-must not be silently discarded
+последнее обновление можно схлопывать
+обязательное изменение пользователя нельзя молча отбрасывать
 ```
 
-Переданный source analysis не перечисляет политику coalescing для всех request types, поэтому этот документ не расширяет её за подтверждённые cases.
+Источник не описывает политику для всех типов запросов, поэтому правило не расширяется за подтверждённые случаи.
 
-## Связь с freshness
-
-Coalescing оптимизирует доставку актуального intent, но сам по себе не доказывает freshness данных:
-
-```text
-latest queued request
-!= current Revit snapshot
-```
-
-Freshness по-прежнему зависит от document/view/selection state и lifecycle invalidation.
+Последний запрос в очереди сам по себе не доказывает актуальность снимков Revit.

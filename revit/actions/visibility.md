@@ -1,45 +1,27 @@
-# Visibility actions
+# Действия временной видимости
 
-`VisibilityActionService` реализует temporary visibility operations в текущем Revit view.
+`VisibilityActionService` реализует временную видимость в текущем Revit-виде.
 
-Подтверждённые Domain intents:
-
-- `HideTemporary`;
-- `IsolateTemporary`;
-- `IsolateInverse`;
-- `ResetTemporary`.
-
-## Поток
+Подтверждены `HideTemporary`, `IsolateTemporary`, `IsolateInverse`, `ResetTemporary`.
 
 ```text
-matched set
-↓
-Application VisibilitySetCalculator
-↓
-target set / action intent
-↓
-IRevitGateway.ApplyVisibilityAsync
-↓
-VisibilityActionService
-↓
-Revit View temporary visibility API
+найденный набор
+→ VisibilitySetCalculator
+→ целевой набор / тип действия
+→ IRevitGateway.ApplyVisibilityAsync
+→ VisibilityActionService
+→ API временной видимости Revit View
 ```
 
-`IsolateInverse` особенно хорошо показывает разделение ответственности: Application вычисляет «всё кроме matched», а Revit adapter реализует полученный target set через host API.
+`IsolateInverse` хорошо показывает разделение ответственности: Application вычисляет «всё кроме найденного», а Revit реализует полученный набор средствами среды.
 
-## Transaction requirement
+## Требование транзакции
 
-В пользовательском тестировании был обнаружен реальный дефект: isolation выполнялась вне требуемого Revit transaction context и завершалась ошибкой. Реализация была исправлена.
+В пользовательском тестировании обнаружен реальный дефект: изоляция выполнялась вне требуемого Revit-контекста транзакции и завершалась ошибкой. Реализация была исправлена.
 
-Отсюда системный invariant:
-
-> Корректный semantic action не отменяет требований host API к execution/transaction context.
-
-## Failure boundary
+> Корректный смысл действия не отменяет требований Revit API к контексту выполнения и транзакции.
 
 ```text
-valid target set
-!= successful visibility mutation
+корректный целевой набор
+!= успешное изменение видимости
 ```
-
-Если Revit не разрешает action в текущем состоянии, UI должен получить явную ошибку, а не выглядеть так, будто фильтр вернул пустой набор.
