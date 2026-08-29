@@ -1,21 +1,19 @@
-# Application Filtering
+# Filtering execution
 
-`FilterEvaluator` вычисляет Domain `FilterDefinition` над `ElementSnapshot`.
+Domain определяет, **что означает** `FilterDefinition`. Application отвечает за то, **как вычислить** его над набором `ElementSnapshot`.
 
-Реализация использует три стратегии:
+## Документы
 
-1. inverted index fast path;
-2. sequential scan;
-3. parallel scan.
+- [`evaluation-pipeline.md`](evaluation-pipeline.md) — общая evaluation contract;
+- [`evaluation-strategies.md`](evaluation-strategies.md) — inverted / sequential / parallel;
+- [`native-compatibility.md`](native-compatibility.md) — анализ возможности представить semantic filter как Revit native filter.
 
-Для сложных деревьев используется compiled evaluation plan с short-circuit AND / OR.
-
-## Инвариант
+## Главный инвариант
 
 ```text
-same fresh snapshots
-+ same FilterDefinition
-→ same matched set
+same FilterDefinition
++ same valid input snapshots
+→ same semantic match set
 ```
 
-Выбор стратегии — performance decision, а не изменение semantics.
+Выбор optimization strategy не должен менять смысл фильтра.

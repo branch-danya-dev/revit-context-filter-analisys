@@ -1,0 +1,40 @@
+@startuml
+skinparam componentStyle rectangle
+
+title ContextFilter — Application flow
+
+actor User
+component UI
+component "Application Use Cases" as UC
+component "Context / Projection Services" as CTX
+component "FilterEvaluator" as FE
+component "Action Calculators" as AC
+component "Application Ports" as Ports
+component Domain
+component Revit
+component Infrastructure
+
+User --> UI
+UI --> UC
+UC --> Domain
+UC --> CTX
+CTX --> Ports : collect / index / values
+CTX --> Domain : snapshots / context models
+UC --> FE
+FE --> Domain : FilterDefinition / FilterResult
+UC --> AC
+AC --> Domain : action intent
+UC --> Ports
+Ports --> Revit
+Ports --> Infrastructure
+
+note right of FE
+Evaluation strategy is execution policy,
+not filter semantics.
+end note
+
+note bottom of Ports
+Ports define required capabilities.
+Adapters own implementation details.
+end note
+@enduml

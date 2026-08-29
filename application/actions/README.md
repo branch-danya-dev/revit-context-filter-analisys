@@ -1,17 +1,22 @@
-# Application Actions
+# Actions
 
-Application рассчитывает намерение над matched set до host-specific записи.
+Application actions начинаются после получения matched element set.
 
-В реализации существуют:
+Эта область не вызывает Revit API. Она вычисляет нужный target set и orchestrates вызов output port.
 
-- `SelectionSetCalculator` — Replace / Add / Exclude;
-- `VisibilitySetCalculator` — в том числе inverse isolation.
+## Документы
+
+- [`selection-and-visibility-calculation.md`](selection-and-visibility-calculation.md) — set calculations;
+- [`action-orchestration.md`](action-orchestration.md) — переход от filter result к host action.
+
+## Граница
 
 ```text
-FilterResult
-→ action calculation
-→ Revit port
-→ native host operation
+matched set
+→ Application calculation
+→ target intent
+→ IRevitGateway
+→ Revit side effect
 ```
 
-Application не владеет `UIDocument.Selection`, `View.HideElements` или Revit transactions — это [`../../revit/`](../../revit/).
+`FilterResult` и результат Revit action — разные состояния.
