@@ -1,15 +1,17 @@
-# Application Ports
+# Application ports
 
-Ключевой host port — `IRevitGateway`.
+Ports задают то, что Application требует от внешнего мира, не фиксируя конкретную реализацию.
 
-Через него Application запрашивает:
+## Основные группы
 
-- context info / context collection;
-- parameter index / values;
-- selection actions;
-- visibility actions;
-- native filter creation.
+- [`revit-gateway.md`](revit-gateway.md) — взаимодействие с host application;
+- [`supporting-ports.md`](supporting-ports.md) — persistence, settings, presentation, dialogs, logging.
 
-Другие порты включают preset store, filter history, settings/preferences, logging и UI-support services.
+## Правило Ports & Adapters
 
-Порт определяет требуемую способность системы; конкретная реализация находится вне Application.
+```text
+Application depends on interface
+Adapter depends on Application contract
+```
+
+Порт не должен раскрывать Revit API types или JSON-specific details, если Application не нуждается в них семантически.
