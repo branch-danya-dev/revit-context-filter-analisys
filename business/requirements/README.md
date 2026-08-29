@@ -1,28 +1,47 @@
 # Requirements
 
-Исходные требования были переданы заказчиком двумя документами и затем точечно уточнялись в общении.
+Этот раздел хранит нормализованный requirement set ContextFilter.
 
-Они рассматриваются как **один развивающийся requirement set**, а не как два независимых продукта.
+Исходные требования были переданы двумя customer documents и точечно уточнялись в общении. Они рассматриваются как **одна развивающаяся задача**.
+
+## Документы
+
+- [`functional-requirements.md`](functional-requirements.md) — функциональное поведение продукта;
+- [`non-functional-requirements.md`](non-functional-requirements.md) — ограничения качества и требования устойчивости;
+- [`business-rules.md`](business-rules.md) — правила, которые должны сохранять пользовательский смысл системы;
+- [`acceptance-criteria.md`](acceptance-criteria.md) — исходная пустая формальная секция, derived acceptance baseline и фактическая приёмка.
 
 ## Эволюция
 
 ```text
 Initial request
-→ Category / Family / Type navigation
-→ select / hide / isolate
+→ Category / Family / Type
+→ Select / Hide / Isolate
 
 Extended request
-→ current selection as context
-→ richer parameter filtering
+→ Current Selection context
+→ parameter filtering
 → AND / OR
 → dynamic highlight
-→ presets and templates
-→ inverse actions
+→ presets / templates
+→ inverse / exclude actions
 
 User testing
-→ lifecycle / validation / performance / host-interaction corrections
+→ settings validation
+→ lifecycle safety
+→ failure visibility
+→ host interaction fixes
+→ performance stabilization
 ```
 
-## Важный принцип
+## Важное различие
 
-Требование описывает ожидаемое поведение, но не определяет автоматически архитектуру решения. Реализация была дополнена инженерными решениями, появившимися в ходе системного анализа и пользовательского тестирования.
+```text
+customer requirement
+!= architecture decision
+!= implementation optimization
+```
+
+Например, presets являются продуктовым требованием, а JSON persistence — уже технической реализацией. Быстрая фильтрация является ожидаемым качеством, а inverted index / parallel scan — способом реализации.
+
+Traceability: [`../traceability/traceability-matrix.md`](../traceability/traceability-matrix.md).

@@ -1,22 +1,30 @@
 # Product Scope
 
+Этот раздел отвечает на вопрос:
+
+> **Что именно является ContextFilter, а что остаётся ответственностью Revit или вообще другой задачи?**
+
+## Канонический документ
+
+- [`scope.md`](scope.md) — in-scope / out-of-scope, граница с Autodesk Revit и правило изменения scope;
+- [`diagrams/product-boundary.puml`](diagrams/product-boundary.puml) — визуальная граница продукта.
+
 ## В системе
 
-- Autodesk Revit 2025 add-in;
-- scope: Active View / Entire Document / Current Selection;
-- навигация Category → Family → Type;
-- фильтрация по параметрам и синтетическим свойствам;
-- логические условия AND / OR;
-- selection actions: Replace / Add / Exclude;
-- temporary visibility actions: Hide / Isolate / Inverse / Reset;
-- создание совместимого штатного Revit `ParameterFilterElement`;
-- reusable presets и templates;
-- runtime lifecycle, caching и responsiveness mechanisms, необходимые для корректной работы внутри Revit.
+```text
+Working context
+→ element discovery
+→ parameter filtering
+→ reusable presets
+→ actions on matched set
+```
 
-## Вне продуктовой границы
+В продукт входят Active View / Entire Document / Current Selection, Category → Family → Type, параметрическая фильтрация, selection / visibility actions, compatible native Revit filter и reusable presets.
 
-- владение исходными BIM-данными модели;
-- произвольное редактирование параметров и геометрии элементов;
-- отдельная задача по корректировке DWG, присутствовавшая среди переданных материалов, но не относящаяся к ContextFilter.
+## Вне границы
 
-Revit остаётся источником истины для документа, элементов, видов, selection и native API state.
+ContextFilter не является редактором BIM-модели и не владеет исходными данными Revit.
+
+В частности, отдельная задача по корректировке DWG не включается в этот кейс без подтверждённой связи с ContextFilter.
+
+Подробности: [`scope.md`](scope.md).

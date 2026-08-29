@@ -1,0 +1,27 @@
+@startuml
+start
+:Work in Revit;
+if (Preselect elements?) then (yes)
+  :Create Revit selection;
+else (no)
+endif
+:Open ContextFilter;
+:Choose working context;
+:Navigate Category / Family / Type;
+:Choose parameter and value;
+:Compose filter conditions;
+:Evaluate matched set;
+if (Save reusable intent?) then (yes)
+  :Save Full preset or Template;
+endif
+:Choose action;
+if (Action type?) then (Selection)
+  :Replace / Add / Exclude;
+elseif (Visibility)
+  :Hide / Isolate / Inverse;
+else (Native filter)
+  :Create compatible Revit filter;
+endif
+:Continue work in Revit;
+stop
+@enduml
