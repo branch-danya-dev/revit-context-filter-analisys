@@ -1,0 +1,41 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+actor User
+rectangle "ContextFilter.UI" {
+  rectangle "MainPaneView /\nMainFilterWindow" as View
+  rectangle "MainPaneViewModel" as MainVM
+  rectangle "Specialized ViewModels" as VMs
+  rectangle "UI state / feedback" as State
+}
+rectangle "ContextFilter.Application" {
+  rectangle "Use cases / services" as App
+  interface "IRevitGateway / ports" as Ports
+}
+rectangle "ContextFilter.Revit /\nInfrastructure adapters" as Adapters
+
+User --> View : interact
+View --> MainVM : command / binding
+MainVM --> VMs : coordinate presentation
+VMs --> MainVM : selected UI state
+MainVM --> App : invoke workflow
+App --> Ports : external capability
+Ports --> Adapters : adapter call
+Adapters --> Ports : response / failure
+Ports --> App
+App --> MainVM : result
+MainVM --> State : update
+State --> View : render
+
+note right of View
+Initial binding is not user intent.
+Side effects are suppressed during bind.
+end note
+
+note bottom of State
+Document-bound derived UI state
+must be reset on document transition.
+end note
+@enduml

@@ -1,9 +1,30 @@
 # UI Interaction
 
-Плагин запускается пользователем из Ribbon и не открывается автоматически вместе с Revit.
+Этот раздел описывает пользовательское взаимодействие с ContextFilter: как пользователь открывает инструмент, выбирает контекст, формирует filter intent, запускает действия и получает feedback.
 
-Горячие клавиши являются opt-in настройкой. После пользовательского тестирования комбинация `Ctrl + Click`, конфликтовавшая с native Revit multi-selection, была заменена на `Ctrl + Shift + Click`.
+## Канонический flow
 
-Принцип:
+```text
+Open ContextFilter
+→ choose scope
+→ inspect Category / Family / Type
+→ choose parameter
+→ choose values / conditions
+→ evaluate
+→ inspect matched count
+→ apply selection / visibility / native filter action
+```
+
+UI инициирует этот flow, но не владеет семантикой его шагов.
+
+## Документы
+
+- [`screen-model.md`](screen-model.md) — структура основной рабочей области;
+- [`user-actions.md`](user-actions.md) — пользовательские действия и их границы;
+- [`presentation-modes.md`](presentation-modes.md) — DockablePane и FloatingWindow;
+- [`feedback-and-guardrails.md`](feedback-and-guardrails.md) — предупреждения, blocked state и ошибки;
+- [`host-interaction.md`](host-interaction.md) — взаимодействие с native Revit semantics и hotkeys.
+
+## Инвариант
 
 > Plugin interaction должен дополнять host application, а не незаметно перехватывать его устоявшуюся семантику.
