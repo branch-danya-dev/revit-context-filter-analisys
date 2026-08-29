@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+rectangle "UI / Application" as Caller
+interface "IRevitGateway" as Port
+rectangle "ContextFilter.Revit" {
+  rectangle "RevitExternalEventDispatcher" as GW
+  queue "RevitRequestQueue" as Queue
+  rectangle "ExternalEvent" as EE
+  rectangle "ContextFilterExternalEventHandler" as Handler
+  rectangle "RevitRequestDispatcher" as Dispatcher
+  rectangle "Collection / Parameter / Action services" as Services
+  rectangle "ContextCoordinationService" as Coord
+}
+rectangle "Autodesk Revit" {
+  rectangle "Document / View / UIDocument" as Revit
+  rectangle "Host events\nViewActivated / Idling / Document*" as Events
+}
+
+Caller --> Port : async request
+Port --> GW
+GW --> Queue : enqueue
+Queue --> EE : Raise()
+EE --> Handler : execute on Revit thread
+Handler --> Dispatcher
+Dispatcher --> Services
+Services --> Revit : read / mutate
+Revit --> Services : result / failure
+Services --> Dispatcher
+Dispatcher --> Handler
+Handler --> GW : complete response
+GW --> Port
+Port --> Caller
+
+Events --> Coord : host evidence
+Coord --> Queue : refresh / rebuild when needed
+Coord --> Caller : state/progress coordination
+
+note right of EE
+Revit API access is host-controlled.
+Async caller does not imply
+thread-safe API access.
+end note
+
+note bottom of Services
+Domain meaning is not redefined here.
+This layer realizes it under Revit constraints.
+end note
+@enduml

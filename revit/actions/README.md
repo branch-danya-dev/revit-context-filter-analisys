@@ -1,11 +1,41 @@
-# Revit Actions
+# Actions
 
-Host-specific actions включают:
+`actions/` описывает реальные host-side effects, которые Revit layer выполняет после Application calculations.
 
-- `UIDocument.Selection.SetElementIds`;
-- temporary Hide / Isolate;
-- inverse isolation;
-- Reset temporary visibility;
-- создание / замена `ParameterFilterElement` и привязку к виду.
+## Подтверждённые services
 
-Semantic filter может быть корректным, но не полностью конвертируемым в native Revit filter. Native compatibility — отдельная host constraint.
+- `SelectionActionService` — `UIDocument.Selection.SetElementIds`, optional zoom to selection;
+- `VisibilityActionService` — temporary Hide/Isolate;
+- `NativeFilterActionService` — создание `ParameterFilterElement` и привязка к виду;
+- `FilterDefinitionToElementFilterConverter` — Domain filter → Revit `ElementFilter` subset;
+- `RevitParameterResolver` — `ParameterKey` → Revit parameter representation.
+
+## Общая граница
+
+```text
+Application target set / filter intent
+↓
+IRevitGateway request
+↓
+Revit action service
+↓
+Revit API
+↓
+host state changed or failure returned
+```
+
+## Документы
+
+- [`selection.md`](selection.md)
+- [`visibility.md`](visibility.md)
+- [`native-filter.md`](native-filter.md)
+
+## Ключевое различие
+
+```text
+FilterResult
+!= action target set
+!= successful Revit side effect
+```
+
+Каждый переход имеет собственную failure boundary.

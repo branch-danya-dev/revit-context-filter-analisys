@@ -1,16 +1,35 @@
-# Revit Parameter Mapping
+# Parameters
 
-Revit layer реализует перевод между native `Parameter` и Domain model:
+`parameters/` описывает адаптацию Autodesk Revit parameters к стабильной Domain-модели ContextFilter.
 
-- `RevitParameterKeyFactory`;
-- `RevitParameterValueConverter`;
-- `RevitSyntheticParameterProvider`;
-- `RevitTypeParameterCache`;
-- `RevitParameterResolver`.
+## Подтверждённые компоненты
+
+- `RevitElementSnapshotBuilder` — light snapshots + lazy parameter load;
+- `ParameterIndexService` — host-side support для index/values/inverted indexes;
+- `RevitParameterKeyFactory` — Revit Parameter ↔ Domain `ParameterKey`;
+- `RevitParameterValueConverter` — Revit value → Domain value;
+- `RevitSyntheticParameterProvider` — Category, Family, Level, Workset и другие synthetic properties;
+- `RevitTypeParameterCache` — reuse type-parameter reads.
+
+## Граница
 
 ```text
-Revit representation
-↔ Domain ParameterKey / ParameterValue
+Revit Element / Parameter
+↓
+Revit parameter adapter
+↓
+ParameterKey + Domain value
+↓
+Application filtering
 ```
 
-Физическая форма параметра в Revit не должна менять его Domain meaning.
+`ParameterKey` принадлежит Domain. Revit layer отвечает за то, чтобы корректно создать/разрешить этот key относительно конкретного Revit source.
+
+## Документы
+
+- [`snapshot-building.md`](snapshot-building.md)
+- [`parameter-translation.md`](parameter-translation.md)
+
+## Инвариант
+
+> Удобное display name не может заменять стабильную identity параметра при переходе через Revit boundary.

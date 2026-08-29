@@ -1,9 +1,36 @@
-# Revit Collection
+# Collection
 
-`RevitElementCollector` получает элементы по выбранному Domain `CollectionScope`.
+`collection/` описывает чтение текущего Revit source state и преобразование его в данные, пригодные для Application/Domain.
 
-Host layer также читает Category / Family / Type records и строит light element snapshots.
+## Подтверждённые компоненты
 
-Для больших выборок реализована chunked collection через Revit Idling, чтобы длительная операция не блокировала host UI одним большим вызовом.
+- `RevitElementCollector` — `FilteredElementCollector` по выбранному scope;
+- `RevitElementTreeReader` — Category / Family / Type → `ElementTreeRecord`;
+- `SupportedElementRules` — исключение `View`, `ElementType` и internal categories;
+- `ChunkedCollectionSession` — порционный сбор на `Idling`;
+- `ContextCollectionService` — координация cache, patch и sync/chunked collection;
+- `RevitContextState` — document/view/selection tracking.
 
-Performance thresholds являются деталями реализации, а не частью Domain meaning.
+## Граница
+
+```text
+Revit Document / View / Selection
+↓
+collection adapter
+↓
+source records / snapshots
+↓
+Application projection
+```
+
+Revit layer отвечает за корректное чтение host state. Он не определяет смысл `CollectionScope` — этот enum принадлежит Domain.
+
+## Документы
+
+- [`scope-collection.md`](scope-collection.md)
+- [`chunked-collection.md`](chunked-collection.md)
+- [`context-state.md`](context-state.md)
+
+## Инвариант
+
+> Derived collection data должно оставаться связано с тем Revit document/view/selection state, из которого оно было получено.
