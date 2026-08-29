@@ -1,8 +1,6 @@
-# Dependency registration
+# Регистрация зависимостей
 
-Infrastructure предоставляет собственный registration bundle для DI.
-
-Подтверждённая registration model:
+Infrastructure предоставляет собственный набор регистрации для DI.
 
 ```text
 AddContextFilterInfrastructure()
@@ -14,30 +12,13 @@ AddContextFilterInfrastructure()
 → JsonFilterHistoryStore
 ```
 
-Revit-specific services регистрируются отдельно в `AddinHost.RegisterServices()`.
-
-## Почему это важно
+Сервисы, специфичные для Revit, регистрируются отдельно в `AddinHost.RegisterServices()`.
 
 ```text
-Infrastructure registration
-!= application composition root
+регистрация Infrastructure
+!= корень сборки всего приложения
 ```
 
-Infrastructure знает, какие adapters реализуют его порты, но не должна становиться владельцем Revit host composition.
+Infrastructure знает, какие адаптеры реализуют его порты, но не становится владельцем композиции Revit.
 
-## Dependency direction
-
-```text
-Infrastructure
-→ Application abstractions
-→ Domain
-```
-
-Revit composition root затем связывает Infrastructure, Application, UI и Revit adapters в работающий add-in.
-
-## Инварианты
-
-- Infrastructure не зависит от конкретной WPF ViewModel как от своего контракта;
-- JSON adapter можно заменить без изменения Domain semantics;
-- Revit-specific registrations не должны протекать в Infrastructure package;
-- DI registration является wiring, а не системным ownership.
+Регистрация зависимостей — это связывание реализаций, а не владение системной ответственностью.

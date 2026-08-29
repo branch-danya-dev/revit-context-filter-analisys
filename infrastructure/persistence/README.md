@@ -1,45 +1,23 @@
-# Persistence
+# Хранение данных
 
-Этот раздел описывает физическое хранение состояния ContextFilter и реализацию Application store ports.
+Этот раздел описывает физическое хранение состояния ContextFilter и реализацию портов хранилищ Application.
 
-## Каноническая область
+Infrastructure владеет расположением файлов, JSON-сериализацией/десериализацией, атомарной записью, миграцией сохранённых схем, устранением дублей истории и ограничением её размера.
 
-Infrastructure persistence владеет:
-
-- расположением локальных файлов;
-- JSON serialization/deserialization;
-- atomic write mechanics;
-- persisted-schema migration;
-- history deduplication и retention limits.
-
-Он не владеет смыслом `PresetDefinition` или настройками поведения системы.
-
-## Реализованные stores
-
-| Application port | Infrastructure adapter | Durable file |
+| Порт Application | Адаптер Infrastructure | Файл |
 |---|---|---|
 | `ISettingsStore` | `JsonSettingsStore` | `settings.json` |
 | `IPresetStore` | `JsonPresetStore` | `presets.json` |
 | `IFilterHistoryStore` | `JsonFilterHistoryStore` | `recent.json` |
 
-Физический root:
-
-```text
-%AppData%\ContextFilter\
-```
-
-Подробнее:
+Корень: `%AppData%\ContextFilter\`.
 
 - [`storage-layout.md`](storage-layout.md)
 - [`json-stores.md`](json-stores.md)
 - [`atomic-write.md`](atomic-write.md)
 - [`schema-migrations.md`](schema-migrations.md)
 
-## Инвариант
-
 ```text
-successful serialization
-!= durable successful persistence
+успешная сериализация
+!= успешно завершённая запись на диск
 ```
-
-Для записей, где потеря/повреждение файла критично, Infrastructure должен завершить весь persistence protocol, а не только получить JSON string.

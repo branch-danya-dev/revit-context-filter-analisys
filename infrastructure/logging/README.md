@@ -1,38 +1,22 @@
-# Logging
+# Журналирование
 
-Infrastructure реализует файловый logging adapter для `IAppLogger`.
-
-## Durable location
+Infrastructure реализует файловый адаптер журналирования для `IAppLogger`.
 
 ```text
 %AppData%\ContextFilter\logs\
 ```
 
-`FileAppLogger` зарегистрирован как реализация Application logging port.
-
-## Ownership
-
 ```text
-Application / adapters emit diagnostic event
-              ↓
-           IAppLogger
-              ↓
-        FileAppLogger
-              ↓
-          log files
+Application / адаптеры создают диагностическое событие
+→ IAppLogger
+→ FileAppLogger
+→ файлы журналов
 ```
 
-Infrastructure отвечает за durable logging mechanism, но не за смысл каждой диагностической метрики.
+Infrastructure отвечает за механизм долговременной записи, но не за смысл каждой метрики.
 
-Например:
+- `PerformanceLogger` относится к диагностике выполнения;
+- `CrashTrace` относится к границе устойчивости Revit/WPF;
+- `FileAppLogger` отвечает за запись в файл.
 
-- `PerformanceLogger` относится к runtime/application diagnostics;
-- `CrashTrace` относится к Revit/WPF stability boundary;
-- `FileAppLogger` отвечает за запись логов в файл.
-
-## Инварианты
-
-- лог не является источником Domain truth;
-- отсутствие log entry не доказывает отсутствие события;
-- logging failure не должен изменять смысл фильтра или Revit authority;
-- internal diagnostic detail не должен превращаться в пользовательский success/failure contract без явного mapping.
+Журнал не является источником истины Domain; отсутствие записи не доказывает отсутствие события; ошибка журналирования не должна менять смысл фильтра или состояние Revit.
