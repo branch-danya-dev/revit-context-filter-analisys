@@ -1,0 +1,39 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+title ContextFilter — Infrastructure data flow
+
+component "Application ports" as APP
+component "Infrastructure adapters" as INF
+component "Migration" as MIG
+component "Sanitize / Validate" as SAN
+folder "%AppData%\\ContextFilter" as DATA {
+  file "settings.json" as SETTINGS
+  file "presets.json" as PRESETS
+  file "recent.json" as RECENT
+  folder "logs" as LOGS
+}
+
+APP --> INF : save / load
+INF --> SETTINGS
+INF --> PRESETS
+INF --> RECENT
+INF --> LOGS
+
+SETTINGS --> MIG
+PRESETS --> MIG
+MIG --> SAN
+SAN --> INF : supported runtime representation
+
+note right of SETTINGS
+Persisted data is input,
+not trusted runtime truth.
+end note
+
+note bottom of PRESETS
+JsonPresetStore uses
+atomic write mechanics.
+end note
+
+@enduml

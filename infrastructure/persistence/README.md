@@ -1,13 +1,45 @@
 # Persistence
 
-Infrastructure хранит persisted state, включая presets, filter history и settings.
+Этот раздел описывает физическое хранение состояния ContextFilter и реализацию Application store ports.
 
-Persistence representation не становится каноническим смыслом Domain model.
+## Каноническая область
+
+Infrastructure persistence владеет:
+
+- расположением локальных файлов;
+- JSON serialization/deserialization;
+- atomic write mechanics;
+- persisted-schema migration;
+- history deduplication и retention limits.
+
+Он не владеет смыслом `PresetDefinition` или настройками поведения системы.
+
+## Реализованные stores
+
+| Application port | Infrastructure adapter | Durable file |
+|---|---|---|
+| `ISettingsStore` | `JsonSettingsStore` | `settings.json` |
+| `IPresetStore` | `JsonPresetStore` | `presets.json` |
+| `IFilterHistoryStore` | `JsonFilterHistoryStore` | `recent.json` |
+
+Физический root:
 
 ```text
-Domain model
-↔ serialization / migration
-↔ local persisted representation
+%AppData%\ContextFilter\
 ```
 
-После пользовательского тестирования сбой загрузки presets перестал быть silent failure: пользователю показывается предупреждение.
+Подробнее:
+
+- [`storage-layout.md`](storage-layout.md)
+- [`json-stores.md`](json-stores.md)
+- [`atomic-write.md`](atomic-write.md)
+- [`schema-migrations.md`](schema-migrations.md)
+
+## Инвариант
+
+```text
+successful serialization
+!= durable successful persistence
+```
+
+Для записей, где потеря/повреждение файла критично, Infrastructure должен завершить весь persistence protocol, а не только получить JSON string.
