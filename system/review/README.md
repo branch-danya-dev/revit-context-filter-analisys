@@ -1,15 +1,18 @@
-# Verification & Acceptance
+# System Review
 
-## Техническая проверка
+Review в этом кейсе проверяет не красоту структуры документов, а согласованность четырёх слоёв evidence:
 
-В реализации присутствуют unit / smoke tests для filter engine, use cases, persistence, settings, cache, selection/visibility calculations, request queue и ViewModels.
+```text
+customer requirements
+↕
+system model
+↕
+implemented architecture
+↕
+observed / accepted behavior
+```
 
-CI не выполняет интеграционные тесты с живым Autodesk Revit; host behavior проверялся вручную в реальном Revit.
+## Документы
 
-## Пользовательская проверка
-
-После первой реализации плагин проходил пользовательское тестирование, по итогам которого были исправлены lifecycle, UX, performance и Revit-integration проблемы.
-
-## Приёмка
-
-Финальный результат принимал директор института. Плагин был внедрён и используется. После внедрения ошибок или претензий заказчиком не сообщалось.
+- [`verification-model.md`](verification-model.md) — как сопоставляется требование, модель, реализация и результат;
+- [`consistency-checklist.md`](consistency-checklist.md) — компактная проверка системы перед изменением канонического знания.

@@ -1,26 +1,16 @@
 # System Evolution
 
-После пользовательского тестирования система была стабилизирована по наблюдаемому поведению, а не только по исходному ТЗ.
+Этот раздел показывает не roadmap, а **как фактическое пользовательское тестирование изменило системную модель**.
 
-## Изменения
+- [`post-test-stabilization.md`](post-test-stabilization.md) — наблюдение → системный вывод → изменение поведения.
 
-- некорректные persisted settings → validation + normalization;
-- ошибка загрузки presets → явное предупреждение пользователю;
-- background work после закрытия документа → остановка document-bound operations;
-- UI state при смене документа → automatic reset;
-- hotkeys always-on → opt-in;
-- auto-open при старте Revit → запуск только из Ribbon;
-- `Ctrl + Click` конфликтовал с native multi-selection → `Ctrl + Shift + Click`;
-- event handlers создавали лишнюю нагрузку → активируются только во время использования;
-- built-in presets создавались при старте → lazy initialization при первом открытии панели;
-- isolation выполнялась вне требуемого transaction context → исправлено;
-- shutdown задерживался → оптимизировано освобождение ресурсов.
-
-## Вывод
+Главный цикл:
 
 ```text
-implementation feedback
-→ reopen affected system knowledge
-→ correct behavior
-→ verify again
+implemented behavior
+→ real user testing
+→ observed failure / friction
+→ reopen system assumption
+→ correction
+→ acceptance / deployment
 ```

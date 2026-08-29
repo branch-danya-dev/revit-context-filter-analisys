@@ -1,27 +1,12 @@
 # System Architecture
 
-Реализация использует Clean Architecture.
+Этот раздел хранит целостное архитектурное представление ContextFilter.
 
-```text
-UI ───────────────→ Application ─────→ Domain
-                         ↑
-Infrastructure ──────────┘
+## Документы
 
-Revit ─────────────→ UI / Application / Domain / Infrastructure
-  │
-  └─ Autodesk Revit API
-```
+- [`context.md`](context.md) — система в окружении пользователя и Revit;
+- [`boundaries.md`](boundaries.md) — внешняя граница и authority;
+- [`component-model.md`](component-model.md) — крупные технические компоненты и ответственности;
+- [`system-map.puml`](system-map.puml) — визуальная карта системы.
 
-## Ответственности
-
-| Зона | Ответственность |
-|---|---|
-| Domain | Семантика фильтра, parameter identity, snapshots, presets |
-| Application | Use cases, evaluation, orchestration, ports |
-| Infrastructure | JSON persistence, settings, logging, DI support |
-| UI | WPF views, view models, interaction state |
-| Revit | Add-in entry, ExternalEvent, collectors, native actions, events, transactions |
-
-## Правило зависимостей
-
-Domain не зависит от Revit API. Application работает через абстракции. Revit является host-specific realization внешней границы.
+Здесь описывается **связь компонентов**, а не внутренняя реализация каждого слоя.

@@ -1,0 +1,30 @@
+@startuml
+actor User
+participant UI
+participant Application
+participant RevitLayer as "Revit layer"
+participant Revit as "Autodesk Revit"
+participant Domain
+
+User -> UI : Open filter / choose scope
+UI -> Application : CollectContext
+Application -> RevitLayer : request collection
+RevitLayer -> Revit : collect elements
+Revit --> RevitLayer : ids / parameters / host context
+RevitLayer --> Application : records / snapshots
+Application -> Domain : build semantic representations
+Application --> UI : tree / parameters / values
+
+User -> UI : choose conditions
+UI -> Application : BuildQuickFilter / Evaluate
+Application -> Domain : FilterDefinition + snapshots
+Domain --> Application : semantic models
+Application --> UI : FilterResult
+
+User -> UI : Select / Hide / Isolate / Native Filter
+UI -> Application : action request
+Application -> RevitLayer : resolved action set
+RevitLayer -> Revit : ExternalEvent / transaction if required
+Revit --> RevitLayer : action result
+RevitLayer --> UI : feedback
+@enduml

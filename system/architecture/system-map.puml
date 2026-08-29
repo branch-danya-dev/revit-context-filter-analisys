@@ -1,0 +1,35 @@
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+
+actor "BIM coordinator / Designer" as User
+component "ContextFilter.UI\nWPF / ViewModels" as UI
+component "ContextFilter.Application\nUse Cases / Services" as App
+component "ContextFilter.Domain\nModels / Semantics" as Domain
+component "ContextFilter.Infrastructure\nJSON Persistence / Logging" as Infra
+component "ContextFilter.Revit\nAdd-in / ExternalEvent / Revit API" as RevitPlugin
+component "Autodesk Revit 2025\nDocument / View / Elements / Selection" as RevitHost
+
+User --> UI : filter intent / actions
+UI --> App : use cases
+UI --> Domain : domain models
+App --> Domain : semantic models
+Infra --> App : ports / persistence
+Infra --> Domain : persisted models
+RevitPlugin --> UI : host integration
+RevitPlugin --> Infra
+RevitPlugin --> App
+RevitPlugin --> Domain
+RevitPlugin --> RevitHost : collect / transaction / native actions
+RevitHost --> RevitPlugin : document state / events
+
+note right of Domain
+No Revit/WPF/persistence dependency
+end note
+
+note bottom of RevitHost
+Authority for document,
+elements, views, selection
+and native API state
+end note
+@enduml

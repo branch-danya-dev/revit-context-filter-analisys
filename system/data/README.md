@@ -1,25 +1,9 @@
-# System Data View
+# System Data
 
-Ключевые модели, проходящие через систему:
+Этот раздел описывает **ownership и движение ключевых данных**, а не физическую схему хранения одного слоя.
 
-```text
-CollectionScope
-CollectedContext
-ElementSnapshot
-ParameterKey / ParameterValue
-FilterDefinition
-FilterResult
-PresetDefinition
-```
+- [`ownership-and-movement.md`](ownership-and-movement.md) — source state, derived state, intent и persistence.
 
-## Источник и derived state
+Ключевой принцип:
 
-```text
-Revit document data
-→ authoritative source facts
-
-ElementSnapshot / context tree / parameter index / filter result
-→ derived application state
-```
-
-Derived state должен быть связан с актуальным документом и рабочим контекстом и не может считаться новым источником истины.
+> **Revit source data, derived analytical state и persisted user intent — три разных класса данных с разным authority.**
