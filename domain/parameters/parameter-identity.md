@@ -1,72 +1,27 @@
-# Parameter Identity
+# Идентичность параметра
 
-Каноническая идентичность фильтруемого свойства задаётся `ParameterKey`:
+Каноническая идентичность фильтруемого свойства задаётся `ParameterKey(IdentityKind, IdentityValue, Source)`.
 
-```text
-ParameterKey(
-  IdentityKind,
-  IdentityValue,
-  Source
-)
-```
+Источник подтверждает как минимум семейства `BuiltInParameter`, `SharedParameter`, `ProjectParameter`, `Synthetic` и другие поддерживаемые реализацией виды.
 
-## IdentityKind
+`ParameterSource` различает `Instance`, `Type`, `Synthetic`.
 
-Implementation analysis подтверждает как минимум следующие семейства:
-
-- `BuiltInParameter`;
-- `SharedParameter`;
-- `ProjectParameter`;
-- `Synthetic`;
-- другие поддерживаемые implementation-моделью виды identity.
-
-## Source
-
-`ParameterSource` различает:
+Одинаковая читаемая подпись не означает одинаковый параметр или источник. Поэтому UI может показывать локализованное имя, но фильтр должен ссылаться на `ParameterKey`.
 
 ```text
-Instance
-Type
-Synthetic
-```
-
-Это принципиально: одно и то же читаемое имя не означает одинаковый semantic source.
-
-## Почему display name недостаточно
-
-В Revit одинаковая подпись параметра может встречаться у разных параметров или разных источников.
-
-Поэтому:
-
-```text
-"Марка"
-!= canonical identity
-```
-
-Фильтр должен ссылаться на `ParameterKey`, а UI может отдельно показывать локализованное/читаемое имя.
-
-## Жизненный цикл identity
-
-```text
-Revit parameter / synthetic property
-↓
-resolve identity
-↓
-ParameterKey
-↓
-ElementSnapshot
-↓
-FilterCondition
-↓
-PresetDefinition
-↓
-optional Revit-native resolution
+Revit Parameter / вычисляемое свойство
+→ определить идентичность
+→ ParameterKey
+→ ElementSnapshot
+→ FilterCondition
+→ PresetDefinition
+→ при необходимости разрешить обратно в Revit
 ```
 
 ## Инварианты
 
-1. `ParameterKey` переносит смысл параметра между Domain/Application boundary.
-2. Display name не должен быть canonical lookup key.
-3. Instance и Type parameter semantics не должны смешиваться без явного правила.
-4. Synthetic parameter должен быть явно отличим от native Revit parameter.
-5. Native Revit resolution может завершиться неуспешно, не делая сам `ParameterKey` семантически недействительным для client-side filter.
+1. `ParameterKey` переносит смысл параметра между Domain и Application.
+2. Отображаемое имя не является каноническим ключом поиска.
+3. Параметры экземпляра и типа не смешиваются без явного правила.
+4. Вычисляемый параметр отличим от штатного Revit `Parameter`.
+5. Неудачное разрешение в штатный фильтр Revit не делает `ParameterKey` недействительным для клиентского фильтра.

@@ -1,8 +1,6 @@
-# Element Snapshot
+# ElementSnapshot
 
-`ElementSnapshot` — domain-представление одного Revit-элемента, используемое для клиентской фильтрации без постоянного обращения к Revit API.
-
-Подтверждённая структура содержит:
+`ElementSnapshot` — представление одного Revit-элемента в Domain для клиентской фильтрации без постоянного обращения к Revit API.
 
 ```text
 ElementSnapshot
@@ -14,65 +12,24 @@ ElementSnapshot
 └─ ParameterDisplayNames: ParameterKey → string
 ```
 
-## Главная граница
-
 ```text
 Revit Element
 !=
 ElementSnapshot
 ```
 
-Revit `Element` остаётся host-owned объектом. Snapshot — производное представление данных, необходимых Domain/Application.
+Revit `Element` остаётся объектом среды. `ElementSnapshot` — производное представление необходимых данных.
 
-## Identity
+Параметры ищутся по `ParameterKey`, а отображаемое имя хранится отдельно.
 
-Snapshot хранит как минимум:
+> **Читаемая подпись не является канонической идентичностью параметра.**
 
-- числовой `ElementId`;
-- `UniqueId`;
-- category identity;
-- family/type identity.
-
-Эти данные позволяют отделить identity элемента от отображаемых пользователю подписей.
-
-## Parameters
-
-Параметры представлены через:
+Реализация использует лёгкие снимки и последующую отложенную загрузку параметров. Поэтому:
 
 ```text
-ParameterKey
-→ ParameterValue
-```
-
-а display name хранится отдельно:
-
-```text
-ParameterKey
-→ ParameterDisplayName
-```
-
-Это поддерживает ключевой инвариант:
-
-> **Readable label не является canonical parameter identity.**
-
-## Partial representation
-
-Implementation analysis подтверждает использование light snapshots и последующую lazy-загрузку parameter data.
-
-Из этого следует важное различие:
-
-```text
-parameter not present in current partial snapshot
+параметр ещё не загружен в текущий снимок
 !=
-parameter proven to be missing on source element
+доказано, что параметр отсутствует у элемента Revit
 ```
 
-Domain-модель не должна превращать техническую неполноту snapshot в бизнес-смысл `NotExists`.
-
-## Инварианты
-
-1. Snapshot не изменяет исходный Revit element.
-2. Snapshot должен сохранять identity, достаточную для связи результата с source element.
-3. Parameter lookup выполняется по `ParameterKey`, не по display name.
-4. Partial snapshot должен отличаться по смыслу от доказанного отсутствия значения.
-5. Любая стратегия построения snapshot обязана сохранять одинаковую domain semantics.
+Неполнота технического представления не должна превращаться в смысл `NotExists`.

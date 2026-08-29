@@ -1,6 +1,6 @@
 # Domain
 
-Этот раздел хранит **семантическое ядро ContextFilter** — модели и понятия, смысл которых не должен зависеть от WPF, Revit API, JSON persistence или конкретного алгоритма вычисления.
+Этот раздел хранит **семантическое ядро ContextFilter** — модели и понятия, смысл которых не должен зависеть от WPF, Revit API, JSON-хранения или конкретного алгоритма вычисления.
 
 Domain отвечает на вопрос:
 
@@ -8,49 +8,25 @@ Domain отвечает на вопрос:
 
 ## Структура
 
-- [`context/`](context/) — область сбора, domain-контекст, дерево Category → Family → Type и `ElementSnapshot`;
-- [`parameters/`](parameters/) — идентичность параметров, значения и synthetic properties;
+- [`context/`](context/) — область сбора, контекст, дерево Категория → Семейство → Тип и `ElementSnapshot`;
+- [`parameters/`](parameters/) — идентичность параметров, значения и вычисляемые свойства;
 - [`filtering/`](filtering/) — `FilterDefinition`, дерево условий, логические группы и операторы;
-- [`presets/`](presets/) — reusable filter intent: Full и Template;
-- [`results/`](results/) — результат фильтрации и типы действий над найденным набором;
-- [`diagrams/domain-model.puml`](diagrams/domain-model.puml) — карта основных domain-сущностей.
+- [`presets/`](presets/) — повторно используемые условия фильтра: `Full` и `Template`;
+- [`results/`](results/) — результат фильтрации и типы действий;
+- [`diagrams/domain-model.puml`](diagrams/domain-model.puml) — карта основных сущностей Domain.
 
 ## Что намеренно не описывается здесь
 
-Domain не владеет:
+Domain не владеет сбором через `FilteredElementCollector`, `ExternalEvent`, физическим кэшированием, задержкой событий, порционным/параллельным выполнением, состоянием WPF, JSON-файлами или транзакциями Revit.
 
-- сбором элементов через `FilteredElementCollector`;
-- `ExternalEvent` и Revit API thread boundary;
-- кэшированием, debounce, chunking и parallel evaluation;
-- WPF state и presentation logic;
-- JSON-файлами настроек и пресетов;
-- Revit transactions и созданием `ParameterFilterElement`.
-
-Эти знания принадлежат соответствующим техническим владельцам.
-
-## Dependency rule
+## Правило зависимостей
 
 `ContextFilter.Domain` не имеет внешних NuGet-зависимостей. Остальные слои могут зависеть от Domain, но Domain не должен знать о них.
 
 ```text
-UI ───────────────┐
-Infrastructure ───┼──→ Application ───→ Domain
-Revit ────────────┴───────────────────→ Domain
-
-Domain → ∅
-```
-
-## Канонический принцип
-
-```text
-Technical representation
+Техническое представление
 !=
-Domain meaning
+Смысл Domain
 ```
 
-Например:
-
-- display name параметра не является его identity;
-- `ElementSnapshot` не является Revit `Element`;
-- native Revit filter не является каноническим смыслом `FilterDefinition`;
-- JSON preset не является владельцем смысла `PresetDefinition`.
+Например, отображаемое имя параметра не равно его идентичности, `ElementSnapshot` не равен Revit `Element`, а штатный фильтр Revit не является канонической формой `FilterDefinition`.

@@ -1,66 +1,38 @@
-# Parameter Value Model
+# Модель значения параметра
 
-Значение параметра хранится как domain `ParameterValue`, связанный с `ParameterKey`.
+Значение хранится как `ParameterValue`, связанный с `ParameterKey`. `ParameterValueKind` подтверждает типизированную модель как минимум для `String`, `Integer`, `Double`, `Boolean`, `ElementId` и других поддерживаемых видов.
 
-Implementation analysis подтверждает typed value model через `ParameterValueKind`, включающий как минимум:
-
-```text
-String
-Integer
-Double
-Boolean
-ElementId
-...
-```
-
-## Почему тип важен
-
-Фильтрация не должна сводить все значения к строковому сравнению.
+Фильтрация не должна сводить все значения к строке:
 
 ```text
 "10"
-!=
-10 as integer
-!=
-10.0 as numeric quantity
-!=
-ElementId(10)
+!= 10 как целое число
+!= 10.0 как числовое значение
+!= ElementId(10)
 ```
 
-Конкретное преобразование Revit storage type в `ParameterValue` принадлежит `revit/parameters/`, но полученный Domain value должен сохранять достаточный semantic type.
+Преобразование типов Revit в `ParameterValue` принадлежит `revit/parameters/`, но итоговое значение Domain должно сохранять достаточный типовой смысл.
 
-## Presence semantics
-
-В filter language существуют отдельные операторы:
+## Наличие и пустота
 
 ```text
 Exists / NotExists
 IsEmpty / IsNotEmpty
 ```
 
-Следовательно, Domain различает как минимум два разных вопроса:
+Следовательно:
 
 ```text
-Есть ли параметр?
+Параметр существует?
 !=
-Есть ли у существующего параметра содержательное значение?
+У существующего параметра есть содержательное значение?
 ```
 
-Quick-filter implementation также отдельно компилирует специальные состояния `__missing__` и `__empty__` в `NotExists` и `IsEmpty`.
-
-## Partial snapshot caveat
+Быстрый фильтр отдельно компилирует `__missing__` и `__empty__` в `NotExists` и `IsEmpty`.
 
 ```text
-NOT LOADED
-!= MISSING
+ЕЩЁ НЕ ЗАГРУЖЕН
+!= ОТСУТСТВУЕТ
 ```
 
-Технически ещё не загруженное значение не может автоматически трактоваться как `NotExists`.
-
-## Инварианты
-
-1. Comparison semantics должны учитывать kind значения.
-2. Missing и empty — разные состояния.
-3. Display-formatted value не обязано быть canonical comparison value.
-4. Нормализация не должна менять предметный смысл значения.
-5. Техническая неполнота snapshot не должна создавать ложное missing state.
+Отображаемое форматированное значение также не обязано быть каноническим значением для сравнения.

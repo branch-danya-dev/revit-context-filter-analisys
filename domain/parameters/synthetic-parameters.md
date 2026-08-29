@@ -1,52 +1,24 @@
-# Synthetic Parameters
+# Вычисляемые параметры
 
-ContextFilter расширяет фильтруемую модель свойствами, которые представлены как Domain parameters, хотя не обязательно существуют как обычные Revit `Parameter` objects.
+ContextFilter расширяет фильтруемую модель свойствами, которые представлены как параметры Domain, хотя не обязательно существуют как обычные объекты Revit `Parameter`.
 
-Подтверждённые synthetic keys:
-
-| Key | Смысл |
-|---|---|
-| `Category` | категория элемента |
-| `Family` | семейство |
-| `TypeName` | имя типа |
-| `ElementId` | числовой id элемента |
-| `UniqueId` | стабильный Revit UniqueId |
-| `Workset` | рабочий набор |
-| `Level` | уровень |
-
-## Зачем это нужно
+Подтверждённые ключи: `Category`, `Family`, `TypeName`, `ElementId`, `UniqueId`, `Workset`, `Level`.
 
 Пользователь формулирует фильтр в едином языке:
 
 ```text
 FilterCondition
 → ParameterKey
-→ operator
-→ operands
+→ Operator
+→ Operands
 ```
-
-Неважно, происходит ли значение из native parameter или из вычисляемого свойства элемента.
-
-## Граница
 
 ```text
-Synthetic domain parameter
+Вычисляемый параметр Domain
 !=
-Native Revit Parameter
+Штатный Revit Parameter
 ```
 
-Synthetic property может участвовать в client-side filter, даже если для неё нет прямого native parameter representation.
+Такое свойство может участвовать в клиентской фильтрации, даже если для него нет прямого штатного представления Revit.
 
-Это также означает, что:
-
-```text
-client-side valid condition
-!=
-native-filter-compatible condition
-```
-
-## Ownership
-
-Domain владеет semantic identity synthetic property.
-
-Revit layer владеет способом получить/вычислить конкретное значение из host model.
+Domain владеет его семантической идентичностью, а слой Revit — способом получить или вычислить значение из модели.

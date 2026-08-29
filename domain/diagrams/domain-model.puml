@@ -3,36 +3,31 @@ skinparam monochrome true
 skinparam shadowing false
 skinparam packageStyle rectangle
 
-package "Context" {
+package "Контекст" {
   enum CollectionScope
   class CollectedContext
   class ContextNode
   class ElementSnapshot
 }
-
-package "Parameters" {
+package "Параметры" {
   class ParameterKey
   class ParameterValue
 }
-
-package "Filtering" {
+package "Фильтрация" {
   class FilterDefinition
   class FilterGroup
   class FilterCondition
 }
-
-package "Presets" {
+package "Пресеты" {
   class PresetDefinition
   enum PresetKind
 }
-
-package "Results" {
+package "Результаты" {
   class FilterResult
   enum SelectionAction
   enum VisibilityAction
   enum NativeFilterAction
 }
-
 CollectionScope --> CollectedContext
 CollectionScope --> FilterDefinition
 CollectedContext --> ContextNode
@@ -46,9 +41,8 @@ FilterCondition --> ParameterKey
 PresetDefinition --> PresetKind
 PresetDefinition --> CollectionScope
 PresetDefinition --> FilterGroup
-FilterDefinition ..> FilterResult : evaluated against context
+FilterDefinition ..> FilterResult : вычисляется над контекстом
 FilterResult ..> SelectionAction
 FilterResult ..> VisibilityAction
 FilterResult ..> NativeFilterAction
-
 @enduml
