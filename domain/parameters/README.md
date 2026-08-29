@@ -1,23 +1,38 @@
-# Domain Parameters
+# Domain · Parameters
 
-Параметр идентифицируется не только отображаемым именем.
+`parameters/` описывает **что считается параметром в filter semantics**, как сохраняется его identity и как различаются источник, значение и отображение.
+
+## Документы
+
+- [`parameter-identity.md`](parameter-identity.md) — `ParameterKey`, identity kind и source;
+- [`value-model.md`](value-model.md) — `ParameterValue`, typed value и состояния missing/empty;
+- [`synthetic-parameters.md`](synthetic-parameters.md) — Category, Family, TypeName и другие вычисляемые свойства.
+
+## Основная модель
 
 ```text
 ParameterKey
-= IdentityKind
-+ IdentityValue
-+ Source
+├─ IdentityKind
+├─ IdentityValue
+└─ Source
+
+ParameterKey
+↓
+ParameterValue
+
+ParameterKey
+↓
+DisplayName
 ```
 
-`Source` различает Instance / Type / Synthetic.
+Три связи намеренно разделены.
 
-Синтетические filterable properties включают Category, Family, TypeName, ElementId, UniqueId, Workset и Level.
-
-Ключевые различия:
+## Канонический принцип
 
 ```text
-display name != canonical identity
-instance parameter != type parameter
-synthetic property != native Revit parameter
-missing != empty != not loaded
+parameter label
+!=
+parameter identity
+!=
+parameter value
 ```

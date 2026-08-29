@@ -1,0 +1,54 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+package "Context" {
+  enum CollectionScope
+  class CollectedContext
+  class ContextNode
+  class ElementSnapshot
+}
+
+package "Parameters" {
+  class ParameterKey
+  class ParameterValue
+}
+
+package "Filtering" {
+  class FilterDefinition
+  class FilterGroup
+  class FilterCondition
+}
+
+package "Presets" {
+  class PresetDefinition
+  enum PresetKind
+}
+
+package "Results" {
+  class FilterResult
+  enum SelectionAction
+  enum VisibilityAction
+  enum NativeFilterAction
+}
+
+CollectionScope --> CollectedContext
+CollectionScope --> FilterDefinition
+CollectedContext --> ContextNode
+CollectedContext --> ElementSnapshot
+ElementSnapshot --> ParameterKey
+ElementSnapshot --> ParameterValue
+FilterDefinition --> FilterGroup
+FilterGroup --> FilterGroup
+FilterGroup --> FilterCondition
+FilterCondition --> ParameterKey
+PresetDefinition --> PresetKind
+PresetDefinition --> CollectionScope
+PresetDefinition --> FilterGroup
+FilterDefinition ..> FilterResult : evaluated against context
+FilterResult ..> SelectionAction
+FilterResult ..> VisibilityAction
+FilterResult ..> NativeFilterAction
+
+@enduml

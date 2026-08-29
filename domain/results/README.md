@@ -1,15 +1,22 @@
-# Domain Result
+# Domain · Results and Actions
 
-Фильтрация производит derived result — набор идентификаторов элементов, удовлетворяющих `FilterDefinition` в текущем контексте.
+`results/` отделяет **результат вычисления фильтра** от **намерения выполнить действие над найденным набором**.
+
+## Документы
+
+- [`filter-result.md`](filter-result.md) — semantic role `FilterResult`;
+- [`action-model.md`](action-model.md) — Selection / Visibility / Native Filter action enums.
+
+## Центральное различие
 
 ```text
-fresh snapshots
-+ FilterDefinition
-→ FilterResult
+FilterResult
+!=
+SelectionAction
+!=
+VisibilityAction
+!=
+NativeFilterAction
 ```
 
-`FilterResult`:
-
-- не является новым источником истины;
-- становится устаревшим при изменении filter intent или source context;
-- не определяет дальнейшее действие пользователя.
+Один matched set может использоваться разными действиями без изменения смысла самого фильтра.
