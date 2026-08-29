@@ -1,58 +1,41 @@
-# User actions
+# Пользовательские действия
 
-UI exposes actions over the current evaluated result, but does not perform Revit-side effects itself.
+UI предоставляет действия над текущим вычисленным результатом, но сам не выполняет изменения через Revit API.
 
-## Selection
+## Выделение
 
 ```text
-user clicks action
-→ UI command
-→ Application target-set calculation
+пользователь нажимает кнопку
+→ команда UI
+→ расчёт целевого набора в Application
 → IRevitGateway
-→ Revit adapter
+→ адаптер Revit
 ```
 
-Supported selection intents:
+Поддерживаются `Replace`, `Add`, `Exclude`. Кнопка только инициирует действие; его семантика не принадлежит WPF.
 
-- `Replace`;
-- `Add`;
-- `Exclude`.
+## Видимость
 
-The UI may display the action as a button, but the action semantics are not owned by WPF.
+Поддерживаются временное скрытие, временная изоляция, инверсионная изоляция и сброс временной видимости. UI владеет инициированием команды и отображением состояния выполнения/ошибки, а Revit — фактическим изменением вида.
 
-## Visibility
-
-Supported intents:
-
-- temporary hide;
-- temporary isolate;
-- inverse isolate;
-- reset temporary visibility.
-
-Again, the UI owns command initiation and visible busy/error state. Revit owns actual view mutation.
-
-## Native filter
-
-Creating a native Revit filter is not equivalent to evaluating ContextFilter's semantic filter.
+## Штатный фильтр Revit
 
 ```text
-semantic FilterDefinition
-→ compatibility check
-→ native-filter action request
-→ Revit realization
+FilterDefinition
+→ проверка совместимости
+→ запрос штатного действия
+→ реализация в Revit
 ```
 
-If the semantic filter is incompatible with Revit native filter capabilities, UI must surface that condition rather than silently changing the filter meaning.
+Если фильтр ContextFilter несовместим с возможностями штатного фильтра Revit, UI должен показать это ограничение, а не молча изменить смысл фильтра.
 
-## Dynamic highlight
+## Динамическое выделение
 
-Dynamic highlight is a convenience interaction mode, not a requirement for semantic correctness. It is opt-in/default-off in current calm settings and must remain bounded so that UI convenience does not impose continuous host load.
-
-## Invariant
+Динамическое выделение — дополнительная функция удобства, а не условие корректности фильтра. В текущих безопасных настройках оно выключено по умолчанию и должно быть ограничено так, чтобы удобство UI не создавало постоянную нагрузку на Revit.
 
 ```text
-button enabled
-!= action guaranteed to succeed
+кнопка доступна
+!= действие гарантированно выполнится
 ```
 
-A valid UI command can still fail downstream because of current document/view state, Revit restrictions or native-filter incompatibility. Such failures must return as explicit UI feedback.
+Корректная команда может завершиться ошибкой из-за состояния документа/вида, ограничений Revit или несовместимости штатного фильтра. Ошибка должна вернуться в UI явно.

@@ -1,69 +1,42 @@
-# Screen model
+# Модель экрана
 
-Основная форма `MainPaneView` представляет одну filter session через несколько связанных зон.
+Основная форма `MainPaneView` представляет одну пользовательскую сессию через несколько связанных зон.
 
 ## Верхняя панель
 
-Показывает состояние текущей сессии и быстрые controls:
+Показывает заголовок, переключатель динамического выделения, количество найденных элементов, обновление и прогресс. Это элементы представления, а не источники истины Domain/Application.
 
-- заголовок;
-- dynamic highlight toggle;
-- matched element count;
-- refresh;
-- progress.
-
-Эти элементы отображают или инициируют состояние, но не являются источником истины для Domain/Application.
-
-## Filter workspace
+## Рабочая область фильтра
 
 ```text
-Scope
+Область поиска
 ↓
-Actions
+Действия
 ↓
 ┌─────────────────────┬─────────────────────┬─────────────────────┐
-│ Category / Family / │ Parameters          │ Values / result     │
-│ Type                │                     │                     │
+│ Категория /         │ Параметры           │ Значения / результат│
+│ Семейство / Тип     │                     │                     │
 └─────────────────────┴─────────────────────┴─────────────────────┘
 ↓
-Presets / history
+Пресеты / история
 ```
 
-### 1. Scope
+### Область
+UI показывает `ActiveView`, `EntireDocument`, `CurrentSelection`, их доступность и `BlockedReason`. Смысл `CollectionScope` принадлежит Domain.
 
-Пользователь выбирает `ActiveView`, `EntireDocument` или `CurrentSelection`.
+### Действия
+Пользователь может инициировать `Replace`, `Add`, `Exclude`, скрытие, изоляцию, инверсионную изоляцию, сброс временной видимости и создание/замену штатного фильтра Revit.
 
-UI показывает доступность option и причину блокировки, но канонический смысл `CollectionScope` принадлежит Domain, а проверка/сбор контекста — Application/Revit.
+### Категория / Семейство / Тип
+`TreeView` — навигационная проекция текущего контекста. Отмеченные узлы не являются выделением Revit.
 
-### 2. Actions
+### Параметры
+UI показывает читаемые имена и группы, но `DisplayName` не заменяет `ParameterKey`.
 
-Пользователь может инициировать:
+### Значения / результат
+Показываются значения выбранного параметра и активные условия. Список значений — производная проекция текущего контекста.
 
-- Replace selection;
-- Add to selection;
-- Exclude from selection;
-- Hide;
-- Isolate;
-- inverse isolate;
-- reset temporary visibility;
-- create/replace native Revit filter.
+### Пресеты / история
+UI управляет командами загрузки, сохранения и удаления. Физическое хранение принадлежит Infrastructure, `PresetDefinition` — Domain.
 
-### 3. Category / Family / Type
-
-TreeView является навигационной проекцией текущего context. Отмеченные узлы — UI selection state, а не Revit selection.
-
-### 4. Parameters
-
-Параметры отображаются как доступные пользователю labels/groups. Display name не заменяет канонический `ParameterKey`.
-
-### 5. Values / result
-
-Показываются значения выбранного parameter и активные filter conditions. Видимый список значений — derived projection текущего context, а не самостоятельная persisted truth.
-
-### 6. Presets / history
-
-UI позволяет загрузить, сохранить или удалить preset и повторно использовать history. Persisted representation принадлежит Infrastructure, а `PresetDefinition` — Domain.
-
-## Другие tabs
-
-Реализация также содержит Help и Settings tabs. Они относятся к presentation/configuration interaction и не создают отдельной системной ответственности.
+Реализация также содержит вкладки справки и настроек; они не создают отдельную системную ответственность.
