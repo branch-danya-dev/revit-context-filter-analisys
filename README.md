@@ -63,7 +63,7 @@ ContextFilter.Revit ───────────→ все слои
 
 ## Структура репозитория
 
-Репозиторий построен по принципам [SSAD](https://github.com/branch-danya-dev/ssad-methodology) и по той же логике, что [Aveli System Analysis](https://github.com/branch-danya-dev/aveli-system-analysis): сначала бизнес и система в целом, затем реальные технические зоны ответственности.
+Репозиторий построен по принципам [SSAD](https://github.com/branch-danya-dev/ssad-methodology): сначала бизнес и система в целом, затем реальные технические зоны ответственности.
 
 ```text
 business/        → зачем существует продукт, требования, scope, процессы, traceability
