@@ -118,7 +118,8 @@ A snapshot may be:
 ```text
 current + light
 current + sufficiently enriched
-stale + light\stale + enriched
+stale + light
+stale + enriched
 ```
 
 Only current snapshots with enough materialized knowledge for the requested operation should participate in authoritative filter evaluation.
