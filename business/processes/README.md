@@ -1,25 +1,27 @@
-# User Process
+# User Processes
 
-Базовый пользовательский сценарий:
+Этот раздел описывает ContextFilter как пользовательский workflow, не раскрывая внутреннюю Application orchestration.
+
+## Основной сценарий
+
+- [`main-user-journey.md`](main-user-journey.md) — полный путь от рабочего контекста Revit до действия над matched set;
+- [`diagrams/main-user-flow.puml`](diagrams/main-user-flow.puml) — визуальный flow.
+
+Коротко:
 
 ```text
-Открыть ContextFilter из Ribbon
-        ↓
-Выбрать scope
-        ↓
-Получить Category → Family → Type
-        ↓
-Сузить набор категорий / типов
-        ↓
-Выбрать параметр и значения
-        ↓
-Сформировать FilterDefinition
-        ↓
-Получить matched elements
-        ↓
-Выбрать действие
-        ↓
-Selection / Hide / Isolate / Native Filter
+Работа в Revit
+→ выбрать scope
+→ открыть ContextFilter
+→ Category / Family / Type
+→ parameter + value
+→ filter result
+→ action
+→ продолжить работу в Revit
 ```
 
-Дополнительно пользователь может сохранить filter intent как preset или template и повторно применить его в другом рабочем контексте.
+Альтернативный путь начинается с предварительного selection и ограничивает дальнейшую фильтрацию этим набором.
+
+Сохранение preset / template является дополнительным шагом повторного использования filter intent, а не обязательной частью каждого сценария.
+
+Техническая orchestration этих действий принадлежит [`../../application/`](../../application/).
