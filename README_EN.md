@@ -20,11 +20,21 @@
   <code>SSAD</code>
 </p>
 
+<p align="center">
+  <a href="https://t.me/sadblueses">
+    <img src="https://img.shields.io/badge/Telegram-@sadblueses-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" />
+  </a>
+  &nbsp;
+  <a href="mailto:danrogulin@gmail.com">
+    <img src="https://img.shields.io/badge/Email-danrogulin%40gmail.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white" />
+  </a>
+</p>
+
 ---
 
 ## Project Context
 
-**ContextFilter is not a hypothetical training system. It is a real Autodesk Revit add-in that moved from a customer request through analysis, solution design, implementation, user testing, acceptance and deployment.**
+**ContextFilter is an Autodesk Revit add-in that moved from a customer request through analysis, solution design, implementation, user testing, acceptance and deployment.**
 
 | Question | Context |
 |---|---|
@@ -37,8 +47,6 @@
 | **Acceptance** | Final result accepted by the institute director. |
 | **Outcome** | Accepted, deployed and in use. No errors or complaints were reported by the customer after deployment. |
 | **What this repository is** | A public, anonymized, reader-oriented reconstruction of the implemented system analysis; production source code is not published here. |
-
-The organization name is intentionally not disclosed. Exact user or department counts are not claimed because those data were not collected as part of this case.
 
 ```text
 Customer request + BIM expertise
